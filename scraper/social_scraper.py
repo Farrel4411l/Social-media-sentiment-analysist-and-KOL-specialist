@@ -1,50 +1,77 @@
 # Author: Muhammad Farrel Haidar
 # Project: AI PR & KOL Specialist DSS
-# Date: 2026-09-22
+# Date: 2026-09-24
 
 import asyncio
+import os
 from typing import List
+from apify_client import ApifyClientAsync
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class SocialMediaScraper:
     """
     Modul untuk melakukan penarikan data (scraping) dari media sosial 
-    (Reddit, Twitter, Tiktok) berdasarkan keyword tertentu.
+    menggunakan layanan Apify (Instagram Scraper).
     """
     def __init__(self):
-        # Implementasi riil: Inisialisasi API client di sini
-        # Contoh PRAW (Reddit API):
-        # import praw
-        # self.reddit = praw.Reddit(client_id="YOUR_ID", client_secret="YOUR_SECRET", user_agent="Scraper 1.0")
-        
-        # Contoh Apify Client (Untuk Instagram/TikTok/Twitter):
-        # from apify_client import ApifyClient
-        # self.apify_client = ApifyClient("YOUR_API_TOKEN")
-        pass
+        # Menginisialisasi Apify Client dengan token API dari .env
+        self.apify_token = os.getenv("APIFY_API_TOKEN", "")
+        self.client = ApifyClientAsync(self.apify_token)
 
-    async def scrape_by_keyword(self, keyword: str, limit: int = 50) -> List[str]:
+    async def scrape_by_keyword(self, keyword: str, limit: int = 5) -> List[str]:
         """
-        Mensimulasikan penarikan data asynchronous dari media sosial berdasarkan nama brand/isu.
-        Mengembalikan list of strings berisi komentar/opini publik.
+        Melakukan scraping riil ke Instagram (via Apify) berdasarkan keyword/hashtag.
+        Mengembalikan list of strings berisi caption/teks.
         """
-        print(f"[Scraper] Memulai penarikan data untuk keyword: '{keyword}'...")
-        # Simulasi delay network/API request
-        await asyncio.sleep(1.5)
+        print(f"[Scraper] Memulai penarikan data riil via Apify untuk keyword: '{keyword}'...")
         
-        # Mock data (Skeleton pengganti request API sungguhan)
-        # Template ini otomatis beradaptasi dengan keyword yang diinputkan pengguna.
-        mock_posts = [
-            f"Saya sangat suka {keyword}, performanya konsisten dan luar biasa.",
-            f"Kemarin nyoba beli {keyword} tapi harganya ternyata sudah naik drastis ya, agak kecewa.",
-            f"Wah {keyword} lagi viral banget di TikTok, semua orang pada ngomongin!",
-            f"Ada yang tau ngga sih bedanya produk {keyword} yang asli sama palsu? Banyak beredar yang palsu, saya takut salah beli.",
-            f"Customer service dari {keyword} kurang responsif kalau ada komplain. Sayang banget padahal produknya bagus."
-        ]
+        # Konfigurasi input untuk apify/instagram-scraper
+        # Menggunakan directUrls untuk mengekstrak postingan, bukan sekadar metadata hashtag
+        run_input = {
+            "directUrls": [f"https://www.instagram.com/explore/tags/{keyword}/"],
+            "resultsType": "posts",
+            "resultsLimit": limit
+        }
         
-        # Memperbanyak mock data hingga mencapai limit yang diminta
-        results = (mock_posts * ((limit // len(mock_posts)) + 1))[:limit]
-        
-        print(f"[Scraper] Berhasil menarik {len(results)} postingan/komentar terkait '{keyword}'.")
-        return results
+        try:
+            # Memanggil Actor Apify (apify/instagram-scraper)
+            # Proses ini membutuhkan waktu beberapa saat tergantung dari sisi server Apify
+            run = await self.client.actor("apify/instagram-scraper").call(run_input=run_input)
+            
+            # Mendapatkan dataset ID (kompatibilitas dengan apify-client v3)
+            dataset_id = run.get("defaultDatasetId") if isinstance(run, dict) else getattr(run, "defaultDatasetId", getattr(run, "default_dataset_id", None))
+            
+            # Mengambil hasil dari default dataset
+            dataset_items = await self.client.dataset(dataset_id).list_items()
+            
+            results = []
+            for item in dataset_items.items:
+                # Mengekstrak teks/caption dari postingan Instagram
+                caption = item.get("caption", "")
+                if caption:
+                    # Bersihkan sedikit (ambil 200 karakter pertama agar SLM tidak kepenuhan context)
+                    results.append(caption[:200])
+                    
+            print(f"[Scraper] Berhasil menarik {len(results)} postingan riil dari Instagram terkait '{keyword}'.")
+            
+            # Jika dataset kosong (tidak ada hasil)
+            if not results:
+                raise Exception(f"Penarikan data selesai, namun tidak ada postingan/caption riil yang ditemukan untuk keyword: '{keyword}'.")
+                
+            return results
+            
+        except Exception as e:
+            error_msg = str(e)
+            print(f"[Scraper Error] Terjadi kendala saat memanggil Apify: {error_msg}")
+            
+            # Cek apakah error disebabkan oleh limitasi kuota Apify
+            if "quota" in error_msg.lower() or "limit" in error_msg.lower() or "rate" in error_msg.lower() or "payment" in error_msg.lower():
+                raise Exception("Gagal menarik data: Kuota/Limit API Apify Anda telah habis atau sedang dibatasi (Rate Limit).")
+            
+            # Melemparkan error asli ke endpoint tanpa mock data
+            raise Exception(f"Gagal menarik data dari media sosial riil: {error_msg}")
 
 # Singleton instance untuk diimpor ke file lain
 social_scraper = SocialMediaScraper()

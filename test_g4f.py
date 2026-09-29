@@ -1,0 +1,10 @@
+from g4f.client import Client
+import json
+
+client = Client()
+prompt = 'Return exactly this JSON: {\"Campaign Objective\": \"Testing g4f\"}'
+response = client.chat.completions.create(
+    model='gpt-3.5-turbo',
+    messages=[{'role': 'user', 'content': prompt}]
+)
+print('Response:', response.choices[0].message.content)

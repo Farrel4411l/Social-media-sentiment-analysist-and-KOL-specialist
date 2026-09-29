@@ -23,7 +23,7 @@ class RAGOrchestrator:
         docs = self.vector_db.similarity_search(query, k=k)
         return [doc.page_content for doc in docs]
 
-    def process_sentiment_for_brief(self, sentiment_data: Dict[str, Any]) -> Dict[str, Any]:
+    def process_sentiment_for_brief(self, sentiment_data: Dict[str, Any], keyword: str = "", api_key: str = None) -> Dict[str, Any]:
         """
         Menerima ekstraksi sentimen, melakukan retrieval RAG, dan 
         memanggil model SLM untuk menghasilkan teks KOL Brief JSON.
@@ -38,7 +38,9 @@ class RAGOrchestrator:
         # 2. Generation (SLM Prompting)
         generated_brief = self.slm_generator.generate_brief(
             sentiment_data=sentiment_data,
-            rag_context=retrieved_frameworks
+            rag_context=retrieved_frameworks,
+            keyword=keyword,
+            api_key=api_key
         )
         
         return {

@@ -33,15 +33,77 @@ class StrategistSLMGenerator:
         # return HuggingFacePipeline(pipeline=pipe)
         
         class MockLLM:
-            def invoke(self, prompt_text: str):
-                # Model pura-pura mengembalikan struktur JSON yang diminta
-                mock_response = {
-                    "Campaign Objective": "Memulihkan kepercayaan audiens dan membuktikan kualitas serta keaslian produk",
-                    "Psychological Angle": "Menggunakan Cialdini's Social Proof dipadukan dengan PAS (Problem, Agitate, Solution) untuk menjawab keraguan konsumen",
-                    "Persona": "Otoritatif namun berempati (Authority & Empathetic), jujur, dan edukatif",
-                    "Storyline": "KOL memulai dengan menceritakan pengalaman buruk (pain point) saat membeli produk palsu, kemudian menunjukkan produk asli brand ini, melakukan demonstrasi nyata, dan mengajak audiens untuk hanya membeli dari official store."
-                }
+            def invoke_with_keyword(self, prompt_text: str, keyword: str):
+                import re
+                
+                # Mengekstrak teks pain_points atau original_text dari prompt
+                pain_points = ""
+                match = re.search(r'"original_text":\s*"([^"]+)"', prompt_text)
+                if match:
+                    pain_points = match.group(1).lower()
+                else:
+                    pain_points = prompt_text.lower()
+                
+                # Deteksi Konteks Entitas Berdasarkan Teks
+                context_type = "produk" # Default
+                
+                # Gunakan keyword sebagai default entitas, atau 'brand ini'
+                entity_name = keyword.upper() if keyword else "tokoh/brand tersebut"
+                
+                # Kategori Tokoh Politik / Pemerintahan
+                if any(k in pain_points for k in ["jokowi", "prabowo", "gibran", "presiden", "menteri", "pemerintah", "pemilu", "politik", "pejabat", "ijazah", "kpu", "trump", "putin", "biden"]):
+                    context_type = "tokoh_politik"
+                # Kategori Jasa / Layanan / Tech
+                elif any(k in pain_points for k in ["jasa", "layanan", "service", "aplikasi", "gojek", "grab", "bank", "internet", "wifi"]):
+                    context_type = "jasa"
+                # Kategori Gerakan / Sosial
+                elif any(k in pain_points for k in ["kampanye", "gerakan", "donasi", "sosial", "lingkungan", "climate", "aksi"]):
+                    context_type = "campaign_sosial"
+                # Kategori Public Figure / Artis
+                elif any(k in pain_points for k in ["artis", "penyanyi", "band", "aktor", "konser", "film"]):
+                    context_type = "public_figure"
+                
+                # Generate Dynamic JSON based on context and WEAVE the keyword!
+                if context_type == "tokoh_politik":
+                    mock_response = {
+                        "Campaign Objective": f"Memperbaiki citra publik {entity_name}, meredam misinformasi yang beredar, dan membangun sentimen positif berdasarkan rekam jejak nyata.",
+                        "Psychological Angle": "Menggunakan pendekatan Empathy & Authority. Menyadari keresahan masyarakat (PAS) lalu memposisikan tokoh sebagai pendengar yang membawa solusi riil dan stabilitas.",
+                        "Persona": "Netral, intelektual, namun merakyat (Grassroots Empathy) dan terpercaya.",
+                        "Storyline": f"KOL (misalnya pengamat atau masyarakat sipil) memulai dengan membahas opini publik atau polemik seputar {entity_name} yang sedang hangat di masyarakat. Kemudian, KOL membedah fakta/data secara objektif mengenai langkah konkrit yang diambil oleh {entity_name}, lalu mengajak audiens berdiskusi sehat di kolom komentar tanpa terbawa hoaks atau provokasi."
+                    }
+                elif context_type == "jasa":
+                    mock_response = {
+                        "Campaign Objective": f"Meningkatkan user acquisition untuk layanan {entity_name} dan membuktikan keandalan serta kemudahannya.",
+                        "Psychological Angle": "Menekan pain point audiens (keribetan/inefisiensi) dan menawarkan layanan ini sebagai 'Life Hack' yang menghemat waktu dan biaya (AIDA).",
+                        "Persona": "Modern, efisien, tech-savvy, dan dapat dipercaya (Relatable Professional).",
+                        "Storyline": f"KOL menunjukkan skenario nyata betapa repotnya mengurus suatu masalah secara manual. Kemudian KOL mendemonstrasikan menggunakan {entity_name} melalui layar, menonjolkan betapa cepat masalah selesai berkat {entity_name}, dan mengajak audiens mencoba dengan link/kode promo."
+                    }
+                elif context_type == "campaign_sosial":
+                    mock_response = {
+                        "Campaign Objective": f"Meningkatkan kesadaran massal (awareness) terkait isu {entity_name} dan mendorong partisipasi aktif/donasi.",
+                        "Psychological Angle": "Menggunakan Emotional Appeal dan Urgency (Framework AIDA) agar audiens merasa terhubung secara emosional dan merasa harus bertindak sekarang juga.",
+                        "Persona": "Inspiratif, peduli, tulus, dan komunikator yang menyentuh hati.",
+                        "Storyline": f"KOL menceritakan fakta menyedihkan atau statistik mengejutkan terkait {entity_name}. KOL menunjukkan visual yang menggugah emosi, lalu mengarahkan audiens untuk ikut mengambil bagian, menandatangani petisi, atau berdonasi untuk aksi {entity_name} melalui link di bio."
+                    }
+                elif context_type == "public_figure":
+                    mock_response = {
+                        "Campaign Objective": f"Membangun hype untuk {entity_name}, membersihkan nama baik dari rumor, dan memperkuat hubungan emosional dengan fanbase.",
+                        "Psychological Angle": "Menggunakan Halo Effect dan Relatability. Menunjukkan sisi otentik yang jarang terlihat (Behind the Scenes).",
+                        "Persona": "Hangat, otentik (Authentic), enerjik, dan bersahabat.",
+                        "Storyline": f"KOL menceritakan perjalanannya mengikuti {entity_name} sejak lama. Memasukkan unsur nostalgia atau behind-the-scenes yang menyentuh, meredam rumor negatif dengan fakta positif, dan mengajak audiens meramaikan project terbaru dari {entity_name}."
+                    }
+                else: # Produk (Default)
+                    mock_response = {
+                        "Campaign Objective": f"Memulihkan kepercayaan audiens terhadap kualitas produk {entity_name} dan membuktikan fungsi serta keasliannya.",
+                        "Psychological Angle": "Menggunakan Cialdini's Social Proof dipadukan dengan PAS (Problem, Agitate, Solution) untuk menjawab keraguan konsumen.",
+                        "Persona": "Otoritatif namun berempati (Authority & Empathetic), jujur, dan aplikatif.",
+                        "Storyline": f"KOL memulai dengan menceritakan pengalaman buruk (pain point) audiens dalam mencari atau menggunakan barang sejenis. Kemudian KOL menunjukkan produk {entity_name} yang asli sebagai solusi terpercaya, mendemonstrasikan penggunaannya secara nyata, dan memandu audiens untuk hanya membeli {entity_name} di official store agar terhindar dari barang palsu."
+                    }
+                    
                 return json.dumps(mock_response)
+
+            def invoke(self, prompt_text: str):
+                return self.invoke_with_keyword(prompt_text, "")
                 
         return MockLLM()
 
@@ -74,9 +136,11 @@ class StrategistSLMGenerator:
             ("user", user_message)
         ])
 
-    def generate_brief(self, sentiment_data: dict, rag_context: list) -> dict:
+    def generate_brief(self, sentiment_data: dict, rag_context: list, keyword: str = "", api_key: str = None) -> dict:
         """
         Menjalankan prompt engineering ke SLM dan mem-parsing output JSON.
+        Jika api_key diberikan, gunakan API Google Gemini yang sebenarnya (google.genai).
+        Jika tidak, gunakan simulasi MockLLM dinamis.
         """
         # Format input data
         sentiment_str = json.dumps(sentiment_data, indent=2)
@@ -90,8 +154,41 @@ class StrategistSLMGenerator:
         
         full_prompt = "\n".join([m.content for m in messages])
         
-        # Eksekusi inference LLM
-        raw_output = self.llm.invoke(full_prompt)
+        # ==========================================
+        # EXECUTE INFERENCE
+        # ==========================================
+        raw_output = ""
+        
+        if api_key:
+            # Gunakan AI Asli (Gemini API)
+            try:
+                from google import genai
+                from google.genai import types
+                
+                client = genai.Client(api_key=api_key)
+                # Gunakan model terbaru yang tersedia di free tier
+                response = client.models.generate_content(
+                    model='gemini-3.6-flash',
+                    contents=full_prompt,
+                    config=types.GenerateContentConfig(
+                        temperature=0.7,
+                        response_mime_type="application/json"
+                    )
+                )
+                raw_output = response.text
+            except Exception as e:
+                # Fallback jika model gagal/key salah
+                print(f"Gemini API Error: {e}")
+                if hasattr(self.llm, 'invoke_with_keyword'):
+                    raw_output = self.llm.invoke_with_keyword(full_prompt, keyword)
+                else:
+                    raw_output = self.llm.invoke(full_prompt)
+        else:
+            # Simulasi Mock Dinamis
+            if hasattr(self.llm, 'invoke_with_keyword'):
+                raw_output = self.llm.invoke_with_keyword(full_prompt, keyword)
+            else:
+                raw_output = self.llm.invoke(full_prompt)
         
         # Parsing string menjadi JSON / Python Dictionary
         try:

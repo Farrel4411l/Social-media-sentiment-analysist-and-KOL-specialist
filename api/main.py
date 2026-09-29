@@ -107,14 +107,23 @@ def predict_budget(request: BudgetRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Gagal memprediksi budget KOL: {str(e)}")
 
+from fastapi import FastAPI, HTTPException, Request
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 @app.post("/generate-campaign-auto")
-async def generate_campaign_auto(request: AutoCampaignRequest):
+async def generate_campaign_auto(request: AutoCampaignRequest, req: Request):
     """
     [PHASE 5] Auto-Scrape & Generate Campaign:
     Menerima keyword, melakukan penarikan data opini publik di media sosial,
     menganalisis agregat sentimennya, lalu men-generate KOL Brief yang sesuai.
     """
     try:
+        # Baca Gemini API Key dari Header (prioritas), jika kosong ambil dari .env
+        gemini_api_key = req.headers.get("X-Gemini-Key") or os.getenv("GEMINI_API_KEY")
+        
         # 1. Scrape data menggunakan keyword (simulasi async)
         scraped_texts = await social_scraper.scrape_by_keyword(request.keyword, limit=5)
         
@@ -125,7 +134,11 @@ async def generate_campaign_auto(request: AutoCampaignRequest):
         sentiment_result = sentiment_engine.analyze(combined_text)
         
         # 4. RAG Context Retrieval & SLM Generation
-        brief_result = rag_orchestrator.process_sentiment_for_brief(sentiment_result)
+        brief_result = rag_orchestrator.process_sentiment_for_brief(
+            sentiment_result, 
+            keyword=request.keyword,
+            api_key=gemini_api_key
+        )
         
         return {
             "status": "success",
