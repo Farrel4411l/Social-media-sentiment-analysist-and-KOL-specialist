@@ -24,8 +24,9 @@ public class Main {
                 "Produk ini sangat bagus, saya suka!", // +1
                 "Keren banget inovasinya", // +1
                 "Pengirimannya jelek dan lama", // -1
-                "Kualitasnya bagus dan awet", // +1
-                "Pelayanannya sangat buruk" // -1
+                "Pelayanannya sangat buruk", // -1
+
+                "Kualitasnya bagus dan awet" // +1
         );
 
         System.out.println("[ DATA INPUT ]");

@@ -16,7 +16,14 @@ public class GoodKolCampaignEngine {
     public void processCampaign(String keyword, List<String> comments, int kolFollowers) {
         System.out.println("Memproses campaign (GOOD ENGINE) untuk keyword: " + keyword);
 
+        // LANGKAH 1: Kita panggil metode khusus yang TUGASNYA MURNI HANYA MENGHITUNG SENTIMEN.
+        // Kita simpan hasilnya ke variabel 'totalSentiment'. Loop terjadi jauh di dalam perut metode ini.
         var totalSentiment = calculateAggregateSentiment(comments);
+        
+        // LANGKAH 2: Kita panggil metode lain yang TUGASNYA MURNI HANYA MENGHITUNG UANG (BUDGET).
+        // Kita beri makan (parameter) 'totalSentiment' yang sudah direkapitulasi secara tepat di langkah 1.
+        // ✅ SOLUSI BUG: Di titik ini, kita sedang berada di LUAR LOOPING dan mustahil bagi variabel 
+        // skor satuan individual untuk 'bocor' atau menyelinap ke sini karena variabelnya sudah diisolasi di metode lain.
         var finalBudget = calculateKolBudget(kolFollowers, totalSentiment);
 
         System.out.println("Total Sentiment Score : " + totalSentiment);
@@ -25,14 +32,21 @@ public class GoodKolCampaignEngine {
 
     private double calculateAggregateSentiment(List<String> comments) {
         var total = 0.0;
+        
+        // Loop berjalan secara berurutan.
         for (var comment : comments) {
+            // Loop ini "bodoh" (tapi ini hal yang bagus!). Ia tidak tahu cara membaca teks.
+            // Ia mendelegasikan (melemparkan) tugas deteksi teks ke metode 'evaluateSingleComment'.
+            // Ia hanya fokus mengakumulasi (+=) nilai (0.0 + 1.0 + (-1.0) dsb) yang dikembalikan metode tersebut.
             total += evaluateSingleComment(comment);
         }
         return total;
     }
 
     private double evaluateSingleComment(String comment) {
-        // Menggunakan Java 21 Switch Expressions & var untuk kode yang lebih bersih
+        // Metode ini sangat terisolasi. Tugasnya 100% membedah teks, ia tidak tahu-menahu urusan uang/budget.
+        // Karena metode kecil dan berumur pendek, ketika nilainya di-return ke atas, 
+        // seluruh variabel sementaranya (lowerComment, keyword) akan dianggap sampah dan langsung disapu habis (Garbage Collection) dari RAM.
         var lowerComment = comment.toLowerCase();
         
         // Ekstraksi keyword utama untuk keperluan demonstrasi Switch Expression
@@ -47,7 +61,8 @@ public class GoodKolCampaignEngine {
     }
 
     private double calculateKolBudget(int kolFollowers, double finalSentimentScore) {
-        // Perhitungan terisolasi dengan baik, 'score' dari sentimen ditarik masuk sebagai parameter
+        // Perhitungan aman terkendali. Variabel 'finalSentimentScore' dijamin berisi 
+        // nilai sentimen keseluruhan (misal 1.0) yang dioper secara sengaja lewat parameter.
         return (kolFollowers * 50.0) + (finalSentimentScore * 1000.0);
     }
 }
