@@ -1,6 +1,6 @@
 # Author: Muhammad Farrel Haidar
 # Project: AI PR & KOL Specialist DSS
-# Date: 2026-09-22
+# Date: 2026-10-03
 
 import numpy as np
 import xgboost as xgb
@@ -8,88 +8,110 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error, r2_score
 import joblib
 import os
+from typing import Dict, Any
 
 class KOLBudgetPredictor:
     """
     Model Regresi berbasis XGBoost untuk memprediksi estimasi budget KOL (Key Opinion Leader)
-    berdasarkan historis interaksi dan performa KOL.
+    berdasarkan metrik audiens dan skor sentimen publik terkini.
     """
     def __init__(self, model_path: str = "data/budget_model.joblib"):
         self.model_path = model_path
         self.model = xgb.XGBRegressor(
             objective='reg:squarederror',
-            n_estimators=150,
+            n_estimators=200,
             learning_rate=0.05,
-            max_depth=5,
+            max_depth=6,
             random_state=42
         )
         self.is_trained = False
         
         # Load model jika sudah ada
         if os.path.exists(self.model_path):
-            self.model = joblib.load(self.model_path)
-            self.is_trained = True
+            try:
+                self.model = joblib.load(self.model_path)
+                # Pastikan model yang di-load adalah model versi baru (4 fitur)
+                if hasattr(self.model, 'n_features_in_') and self.model.n_features_in_ != 4:
+                    print("[ML Predictor] Model lama terdeteksi (3 fitur). Melatih ulang model 4 fitur...")
+                    self.train_dummy_model()
+                else:
+                    self.is_trained = True
+            except Exception:
+                pass
 
     def train_dummy_model(self):
         """
-        Fungsi untuk melatih model dengan dummy dataset.
-        Features yang digunakan: [followers, engagement_rate, target_reach]
-        Target: estimated_budget (IDR)
+        Fungsi untuk melatih model regresi dengan dummy dataset yang mencakup Sentimen.
+        Features: [followers, engagement_rate, target_reach, sentiment_score]
         """
-        print("Membangkitkan data sintetik untuk pelatihan model...")
+        print("[ML Predictor] Membangkitkan data sintetik untuk pelatihan model...")
         np.random.seed(42)
-        n_samples = 500
+        n_samples = 1000
         
-        # Feature 1: Followers (10,000 to 5,000,000)
         followers = np.random.randint(10000, 5000000, n_samples)
-        # Feature 2: Engagement Rate Percentage (0.5% to 15.0%)
         engagement_rate = np.random.uniform(0.5, 15.0, n_samples)
-        # Feature 3: Target Reach (Estimasi impresi dari audiens yang disasar, biasanya 10-30% follower)
         target_reach = followers * np.random.uniform(0.1, 0.3, n_samples)
+        sentiment_score = np.random.uniform(-1.0, 1.0, n_samples)
         
-        X = np.column_stack((followers, engagement_rate, target_reach))
+        X = np.column_stack((followers, engagement_rate, target_reach, sentiment_score))
         
-        # Logic dummy untuk budget: kombinasi berbobot dari metrik performa ditambah sedikit noise/variasi
-        # Base fee (contoh: 50 per follower + bonus tinggi untuk engagement rate + rate tambahan dari reach)
-        budget = (followers * 50) + (followers * engagement_rate * 500) + (target_reach * 100)
-        noise = np.random.normal(0, 1000000, n_samples) # Add some variance
-        y = np.clip(budget + noise, a_min=500000, a_max=None) # Minimum budget 500k IDR
+        # Logic: Sentimen negatif -> budget mahal (KOL Premium untuk damage control)
+        # Sentimen positif -> budget standar (Organik)
+        risk_multiplier = np.where(sentiment_score < 0, 1.5 + abs(sentiment_score), 1.0 - (sentiment_score * 0.2))
+        
+        base_budget = (followers * 50) + (followers * (engagement_rate/100) * 5000)
+        budget = base_budget * risk_multiplier
+        
+        noise = np.random.normal(0, 1000000, n_samples)
+        y = np.clip(budget + noise, a_min=500000, a_max=None)
         
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
         
-        print("Melatih XGBoost Regressor...")
         self.model.fit(X_train, y_train)
         self.is_trained = True
         
-        # Menyimpan model
         os.makedirs(os.path.dirname(self.model_path), exist_ok=True)
         joblib.dump(self.model, self.model_path)
         
-        preds = self.model.predict(X_test)
-        mae = mean_absolute_error(y_test, preds)
-        r2 = r2_score(y_test, preds)
-        
-        return {"status": "trained", "mae": mae, "r2_score": r2}
+        return {"status": "trained"}
 
-    def predict_budget(self, followers: int, engagement_rate: float, target_reach: int) -> float:
+    def predict_budget(self, followers: int, engagement_rate: float, target_reach: int, sentiment_score: float, dominant_emotion: str) -> Dict[str, Any]:
         """
-        Melakukan prediksi harga KOL berdasarkan metrics saat ini.
+        Melakukan prediksi harga KOL dan memproyeksikan estimasi ROI.
         """
         if not self.is_trained:
-            print("Model belum dilatih. Memulai auto-training dengan dummy data...")
             self.train_dummy_model()
             
-        features = np.array([[followers, engagement_rate, target_reach]])
-        predicted_budget = self.model.predict(features)[0]
+        features = np.array([[followers, engagement_rate, target_reach, sentiment_score]])
+        predicted_budget = float(self.model.predict(features)[0])
+        predicted_budget = max(predicted_budget, 500000.0) # Floor di 500k
         
-        # Memastikan tidak ada angka negatif
-        return max(float(predicted_budget), 0.0)
+        # Range estimasi (bawah - atas)
+        min_budget = predicted_budget * 0.9
+        max_budget = predicted_budget * 1.2
+        
+        # Proyeksi ROI (Berapa konversi yang dihasilkan berbanding budget)
+        strategy = "Damage Control & Trust Recovery" if sentiment_score < 0 else "Brand Amplification & Conversion"
+        
+        base_conversion_rate = 0.05
+        # Emosi menentukan seberapa tinggi konversi
+        if dominant_emotion in ["Joy", "Surprise"]:
+            base_conversion_rate = 0.08
+        elif dominant_emotion in ["Anger", "Disappointment"]:
+            base_conversion_rate = 0.02
+            
+        projected_conversions = int(target_reach * base_conversion_rate)
+        cpa = predicted_budget / projected_conversions if projected_conversions > 0 else predicted_budget
+        
+        return {
+            "predicted_budget_mean": predicted_budget,
+            "budget_range_str": f"Rp {int(min_budget):,} - Rp {int(max_budget):,}",
+            "recommended_strategy": strategy,
+            "projected_roi": {
+                "estimated_conversions": projected_conversions,
+                "cost_per_acquisition": f"Rp {int(cpa):,}"
+            }
+        }
 
-if __name__ == "__main__":
-    predictor = KOLBudgetPredictor()
-    metrics = predictor.train_dummy_model()
-    print(f"Model Metrics -> MAE: {metrics['mae']:,.2f}, R2: {metrics['r2_score']:.4f}")
-    
-    # Test Inference
-    est = predictor.predict_budget(followers=150000, engagement_rate=3.5, target_reach=30000)
-    print(f"\nEstimasi Budget untuk Nano/Micro KOL (150K followers, 3.5% ER): Rp {est:,.2f}")
+# Global Instance
+budget_predictor = KOLBudgetPredictor()

@@ -42,6 +42,8 @@ class BudgetRequest(BaseModel):
     followers: int = Field(..., gt=0, description="Jumlah followers KOL")
     engagement_rate: float = Field(..., ge=0.0, le=100.0, description="Engagement rate KOL dalam persentase (contoh: 3.5)")
     target_reach: int = Field(..., gt=0, description="Estimasi jangkauan audiens yang ditargetkan")
+    sentiment_score: float = Field(0.0, description="Skor compound sentimen publik (-1.0 to 1.0)")
+    dominant_emotion: str = Field("Neutral", description="Emosi dominan audiens")
 
 class AutoCampaignRequest(BaseModel):
     keyword: str = Field(..., min_length=2, description="Nama brand atau isu yang ingin ditarik datanya untuk diproses otomatis")
@@ -85,24 +87,19 @@ def generate_brief(request: BriefRequest):
 def predict_budget(request: BudgetRequest):
     """
     [PHASE 4 ML] Memprediksi anggaran yang wajar untuk seorang KOL
-    berdasarkan historis interaksinya menggunakan Regresi XGBoost.
+    serta memproyeksikan ROI berdasarkan skor sentimen.
     """
     try:
-        est_budget = budget_predictor.predict_budget(
+        est_budget_data = budget_predictor.predict_budget(
             followers=request.followers,
             engagement_rate=request.engagement_rate,
-            target_reach=request.target_reach
+            target_reach=request.target_reach,
+            sentiment_score=request.sentiment_score,
+            dominant_emotion=request.dominant_emotion
         )
         return {
             "status": "success",
-            "data": {
-                "estimated_budget_idr": round(est_budget, 2),
-                "input_metrics": {
-                    "followers": request.followers,
-                    "engagement_rate": request.engagement_rate,
-                    "target_reach": request.target_reach
-                }
-            }
+            "data": est_budget_data
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Gagal memprediksi budget KOL: {str(e)}")
@@ -139,6 +136,17 @@ async def generate_campaign_auto(request: AutoCampaignRequest, req: Request):
             keyword=request.keyword,
             api_key=gemini_api_key
         )
+        
+        # 5. ML Budget Predictor (Automated Estimate for a standard Macro KOL)
+        budget_projection = budget_predictor.predict_budget(
+            followers=500000,
+            engagement_rate=4.5,
+            target_reach=150000,
+            sentiment_score=sentiment_result.get("polarity_score", 0.0),
+            dominant_emotion=sentiment_result.get("dominant_emotion", "Neutral")
+        )
+        
+        brief_result["ml_budget_projection"] = budget_projection
         
         return {
             "status": "success",

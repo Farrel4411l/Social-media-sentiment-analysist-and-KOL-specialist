@@ -1,6 +1,6 @@
 # Author: Muhammad Farrel Haidar
 # Project: AI PR & KOL Specialist DSS
-# Date: 2026-09-24
+# Date: 2026-10-03
 
 import streamlit as st
 import requests
@@ -9,14 +9,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Konfigurasi Halaman Dasar
 st.set_page_config(
-    page_title="AI PR & KOL Specialist",
+    page_title="AI PR & KOL Specialist DSS",
     page_icon="🤖",
     layout="wide"
 )
 
-# Kustomisasi CSS untuk tombol yang lebih bersih
 st.markdown("""
 <style>
     .stButton>button {
@@ -31,20 +29,31 @@ st.markdown("""
         background-color: #1a4cd9;
         border-color: #1a4cd9;
     }
+    .metric-card {
+        background: #1e1e1e;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
 </style>
 """, unsafe_allow_html=True)
 
-st.title("🤖 AI PR & KOL Specialist - Campaign Generator")
-st.markdown("Decision Support System (DSS) untuk Digital Marketing yang secara otomatis mengeruk opini publik, mengaitkannya dengan literatur psikologi via RAG, dan mendesain KOL Brief yang persuasif.")
+st.title("🤖 AI PR & KOL Specialist - DSS Campaign Generator")
+st.markdown("Decision Support System (DSS) untuk Digital Marketing yang secara otomatis mengeruk opini publik, mengaitkannya dengan literatur psikologi via RAG, mendesain KOL Brief, dan memproyeksikan **Budget & ROI** dengan *Machine Learning*.")
 
-# Konfigurasi Sidebar
 with st.sidebar:
     st.header("⚙️ Configuration")
     api_url = st.text_input("FastAPI Endpoint URL", value="http://localhost:9998")
     default_gemini = os.getenv("GEMINI_API_KEY", "")
-    gemini_key = st.text_input("Gemini API Key (Opsional)", value=default_gemini, type="password", help="Masukkan API Key Google Gemini (gratis dari Google AI Studio) untuk mendapatkan hasil AI yang sesungguhnya.")
+    gemini_key = st.text_input("Gemini API Key (Opsional)", value=default_gemini, type="password", help="Masukkan API Key Google Gemini untuk mengaktifkan True AI.")
+    
     st.markdown("---")
-    st.markdown("Pastikan backend FastAPI Anda sedang berjalan di port yang sesuai.")
+    st.subheader("🌐 Data Sources (Real APIs)")
+    st.checkbox("Instagram (Apify)", value=True, disabled=True)
+    st.checkbox("NewsAPI", value=True, disabled=True)
+    
+    st.markdown("---")
+    st.caption("Pastikan backend FastAPI Anda sedang berjalan.")
 
 st.markdown("### 🔍 Generate KOL Campaign Secara Otomatis")
 keyword = st.text_input("Masukkan Keyword (Misal: Nama Brand, Isu Viral, Hashtag):", placeholder="Contoh: Tolak Angin")
@@ -53,56 +62,62 @@ if st.button("🚀 Scrape & Generate Campaign", type="primary", use_container_wi
     if not keyword:
         st.warning("Mohon masukkan keyword terlebih dahulu.")
     else:
-        with st.spinner(f"Memproses data untuk '{keyword}'... (Menarik API Sosmed, Analisis NLP, RAG Retrieval, SLM Generation)"):
+        with st.spinner(f"Memproses '{keyword}'... (Multi-Source Scraper -> Deep Sentiment -> RAG -> ML Predictor)"):
             try:
-                # Menyiapkan headers
-                headers = {}
-                if gemini_key:
-                    headers["X-Gemini-Key"] = gemini_key
+                headers = {"X-Gemini-Key": gemini_key} if gemini_key else {}
                 
-                # Memanggil Backend
                 response = requests.post(
                     f"{api_url}/generate-campaign-auto",
                     json={"keyword": keyword},
                     headers=headers,
-                    timeout=120
+                    timeout=150
                 )
                 
                 if response.status_code == 200:
                     res_json = response.json()
-                    st.success("🎉 Campaign berhasil di-generate berdasarkan opini publik riil!")
+                    st.success(f"🎉 Campaign berhasil di-generate dari {res_json.get('data_points_analyzed', 0)} data poin opini publik!")
                     
                     data = res_json.get("data", {})
                     
-                    # Split Layout
                     col1, col2 = st.columns([1, 1.2])
                     
                     with col1:
+                        # SECTION 1: Deep Sentiment
                         with st.container(border=True):
-                            st.subheader("📊 1. Analisis Sentimen & Pain Points")
+                            st.subheader("📊 1. Analisis Sentimen Mendalam")
                             sentiment = data.get("input_sentiment", {})
                             
                             sent_val = sentiment.get('sentiment', 'Unknown').upper()
                             sent_color = "green" if sent_val == "POSITIVE" else "red" if sent_val == "NEGATIVE" else "gray"
                             
-                            st.markdown(f"**Overall Sentiment**: <span style='color:{sent_color}; font-weight:bold;'>{sent_val}</span>", unsafe_allow_html=True)
-                            st.write(f"**Polarity Score**: `{sentiment.get('polarity_score', 0)}`")
+                            st.markdown(f"**Overall Sentiment**: <span style='color:{sent_color}; font-weight:bold;'>{sent_val}</span> (Score: `{sentiment.get('polarity_score', 0)}`)", unsafe_allow_html=True)
+                            
+                            # Dominant Emotion
+                            st.markdown(f"**🎭 Dominant Emotion**: `{sentiment.get('dominant_emotion', 'Neutral')}`")
+                            
+                            # Aspects
+                            aspects = sentiment.get("aspects", {})
+                            if aspects.get("liked_aspects"):
+                                st.markdown("**🟢 Liked Aspects (Top)**: " + ", ".join([f"`{x}`" for x in aspects.get("liked_aspects")]))
+                            if aspects.get("disliked_aspects"):
+                                st.markdown("**🔴 Disliked Aspects (Top)**: " + ", ".join([f"`{x}`" for x in aspects.get("disliked_aspects")]))
                             
                             st.markdown("**🔍 Extracted Pain Points / Highlights:**")
                             st.info(sentiment.get("pain_points", "Tidak ada pain points menonjol."))
                         
+                        # SECTION 2: RAG
                         with st.container(border=True):
                             st.subheader("📚 2. RAG Psychological Frameworks")
-                            st.caption("Referensi framework yang ditarik otomatis berdasarkan masalah audiens.")
+                            st.caption("Referensi psikologi marketing berdasarkan masalah audiens.")
                             frameworks = data.get("retrieved_frameworks", [])
                             for i, fw in enumerate(frameworks):
                                 with st.expander(f"📖 Lihat Framework #{i+1}", expanded=(i==0)):
                                     st.write(fw)
                                 
                     with col2:
+                        # SECTION 3: KOL Brief
                         with st.container(border=True):
                             st.subheader("📝 3. AI Generated KOL Brief")
-                            st.caption("KOL Brief Terstruktur Berdasarkan Data Medsos")
                             brief = data.get("kol_brief", {})
                             
                             if isinstance(brief, dict):
@@ -116,10 +131,27 @@ if st.button("🚀 Scrape & Generate Campaign", type="primary", use_container_wi
                             else:
                                 st.warning("Format Brief Gagal Diparsing. Raw Output:")
                                 st.write(brief)
+                                
+                        # SECTION 4: ML Budget Predictor
+                        with st.container(border=True):
+                            st.subheader("📈 4. ML Budget & ROI Projection")
+                            ml_data = data.get("ml_budget_projection", {})
+                            
+                            if ml_data:
+                                st.caption("Estimasi otomatis untuk KOL tingkat Makro (Asumsi: 500K Followers).")
+                                st.markdown(f"**Rekomendasi Strategi:** `{ml_data.get('recommended_strategy', '')}`")
+                                
+                                m1, m2 = st.columns(2)
+                                m1.metric("Recommended Budget Range", ml_data.get("budget_range_str", ""))
+                                
+                                roi = ml_data.get("projected_roi", {})
+                                m2.metric("Projected Conversions", roi.get("estimated_conversions", 0))
+                                
+                                st.info(f"**Cost Per Acquisition (CPA):** {roi.get('cost_per_acquisition', '')} per konversi.")
+                            else:
+                                st.write("Data ML Budget Predictor tidak tersedia.")
 
-                        
                 else:
-                    # Menangkap error 500 jika limit API Apify habis atau tidak ada data
                     error_detail = response.json().get('detail', response.text)
                     st.error(f"❌ Gagal memproses data.\n\nDetail: {error_detail}")
             except requests.exceptions.ConnectionError:
