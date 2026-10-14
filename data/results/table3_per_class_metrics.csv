@@ -1,0 +1,10 @@
+Model,Class_ID,Sentiment_Class,Precision,Recall,F1-Score,Support (N)
+Random Forest (TF-IDF),0,Negatif,59.60%,89.45%,71.53%,597
+Random Forest (TF-IDF),1,Netral,25.00%,2.87%,5.14%,279
+Random Forest (TF-IDF),2,Positif,69.71%,60.70%,64.89%,402
+XGBoost (TF-IDF),0,Negatif,62.14%,85.76%,72.06%,597
+XGBoost (TF-IDF),1,Netral,26.58%,7.53%,11.73%,279
+XGBoost (TF-IDF),2,Positif,66.93%,62.44%,64.61%,402
+IndoBERT (Fine-Tuned),0,Negatif,68.51%,76.88%,72.45%,597
+IndoBERT (Fine-Tuned),1,Netral,35.00%,30.11%,32.37%,279
+IndoBERT (Fine-Tuned),2,Positif,72.28%,66.17%,69.09%,402

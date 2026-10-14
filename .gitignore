@@ -1,3 +1,4 @@
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
@@ -28,6 +29,16 @@ ENV/
 env.bak/
 venv.bak/
 .ipynb_checkpoints
+
+# IDE & Editor files
 .idea/
 *.iml
 out/
+.vscode/
+
+# Large Model Checkpoints & Weights (>100MB exceeding GitHub limit)
+models/rf_tfidf.pkl
+*.safetensors
+*.pt
+*.pth
+models/indobert_finetuned/checkpoint-*/
