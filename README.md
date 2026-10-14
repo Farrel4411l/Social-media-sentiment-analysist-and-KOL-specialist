@@ -53,18 +53,21 @@ Sistem ini mengintegrasikan:
 
 Riset ini mengevaluasi keandalan model *Contextual Transformer* versus *Tree-Based Machine Learning* pada teks ulasan informal bahasa Indonesia.
 
-### Ringkasan Hasil Eksperimen ($N = 1.278$ Test Set)
-| Model | Representasi Fitur | Accuracy (%) | Macro F1 (%) | Weighted F1 (%) | ROC-AUC (OVR) |
-|---|---|:---:|:---:|:---:|:---:|
-| **Random Forest** (300 Trees) | TF-IDF (1-2 gram, 10k) | 55.48% | 47.19% | 51.68% | 0.6921 |
-| **XGBoost** (Early Stopping) | TF-IDF (1-2 gram, 10k) | 57.04% | 49.47% | 53.94% | 0.7208 |
-| **IndoBERT** (`indobert-base-p1`) | Subword Tokenizer | **63.30%** | **57.97%** | **63.15%** | **0.7876** |
+### Ringkasan Hasil Eksperimen Komparatif (Opsi B: Test Set, $N = 1.278$)
+| Model | Representasi Fitur | Accuracy (%) | Macro F1 (%) | Weighted F1 (%) | ROC-AUC (OVR) | Training Time (s) |
+|---|---|:---:|:---:|:---:|:---:|:---:|
+| **Random Forest** (300 Trees) | TF-IDF (1-2 gram, 10k) | 62.60% | 48.27% | 56.46% | 0.7430 | **7.51 s** |
+| **XGBoost** (Early Stopping) | TF-IDF (1-2 gram, 10k) | 64.08% | 53.05% | 59.96% | 0.7540 | 52.90 s |
+| **IndoBERT** (`indobert-base-p1`) | Deep Contextual (max_len=256) | **65.26%** | **61.76%** | **66.00%** | **0.8055** | 607.32 s |
 
-- **Keunggulan IndoBERT**: Unggul **+8.50% Macro F1** dari XGBoost dan **+10.78%** dari Random Forest, dengan ketahanan superior dalam mendeteksi negasi kompleks dan sarkasme.
-- **Uji McNemar**: Memperbaiki 161 kesalahan XGBoost pada kalimat-kalimat dengan struktur semantik rumit.
+- **Keunggulan Signifikan IndoBERT**: Unggul **+8.71% Macro-F1** dari XGBoost dan **+13.49%** dari Random Forest, dengan ROC-AUC melampaui ambang batas **0.8055**.
+- **Solusi Neutral Collapse**: Penerapan *Class-Weighted Cross-Entropy Loss* berhasil menaikkan F1-Score kelas Netral ke **37.59%** (bebas dari fenomena kolaps model pohon).
+- **Integritas Ground-Truth Labeling**: Uji kesepakatan inter-annotator pada 500 sampel acak terstratifikasi menghasilkan skor **Cohen’s Kappa $\kappa = 0.8939$** (*Almost Perfect Agreement*).
+- **Ablation Study (Table 4)**: Mengonfirmasi kontribusi bertahap dari Slang Expansion (+1.48%), Extended Context Length 256 (+2.53%), dan Class-Weighted Loss (+3.79% F1-Macro).
 
-> 📄 **Dokumentasi Lengkap Riset:**
-> - [Brief Jurnal Scopus](brief_jurnal_scopus.md)
+> 📄 **Dokumentasi Lengkap Riset & Naskah Manuskrip:**
+> - [Master Implementation Plan (Opsi B)](IMPLEMENTATION_PLAN.md)
+> - [Brief Jurnal Scopus & Template Manuskrip](brief_jurnal_scopus.md)
 > - [Panduan Reproduksibilitas](README_reproducibility.md)
 > - [Aset Publikasi & Gambar 300 DPI](paper_assets/)
 

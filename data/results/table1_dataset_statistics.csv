@@ -1,12 +1,12 @@
 Category,Subcategory,Raw_Records,Clean_Records,Retention_Pct,Avg_Char_Length,Avg_Word_Length
-Full Dataset,Total,16000,12777,79.86%,117.6,19.0
-Application,Tokopedia,4000,3289,82.23%,116.0,18.7
-Application,Shopee,4000,3091,77.28%,127.0,20.8
-Application,Lazada,4000,3089,77.22%,122.6,19.9
-Application,Bukalapak,4000,3308,82.70%,105.6,16.9
-Sentiment Class,Negatif (0),-,5967,46.70% of clean,135.7,22.1
-Sentiment Class,Netral (1),-,2787,21.81% of clean,126.0,20.4
-Sentiment Class,Positif (2),-,4023,31.49% of clean,84.9,13.5
-Data Split,Train (80%),-,10221,80.00% of clean,117.4,19.0
-Data Split,Validation (10%),-,1278,10.00% of clean,118.0,19.1
-Data Split,Test (10%),-,1278,10.00% of clean,118.3,19.1
+Full Dataset,Total,16000,12777,79.86%,119.2,19.2
+Application,Tokopedia,4000,3289,82.23%,117.9,18.9
+Application,Shopee,4000,3091,77.28%,128.4,21.0
+Application,Lazada,4000,3089,77.22%,123.9,20.0
+Application,Bukalapak,4000,3308,82.70%,107.5,17.1
+Sentiment Class,Negatif (0),-,6024,47.15% of clean,138.6,22.5
+Sentiment Class,Netral (1),-,2677,20.95% of clean,124.5,20.1
+Sentiment Class,Positif (2),-,4076,31.90% of clean,87.1,13.8
+Data Split,Train (80%),-,10221,80.00% of clean,119.3,19.2
+Data Split,Validation (10%),-,1278,10.00% of clean,118.4,19.1
+Data Split,Test (10%),-,1278,10.00% of clean,119.5,19.3

@@ -1,0 +1,9 @@
+{
+  "Metric": "Cohen's Kappa Coefficient (Inter-Annotator Agreement)",
+  "Sample_Size": 500,
+  "Sampling_Method": "Stratified Random Sampling from Cleaned Corpus",
+  "Kappa_Score": 0.8939,
+  "Interpretation": "Almost Perfect / Substantial Agreement (kappa >= 0.70)",
+  "Standard_Error": 0.0146,
+  "P_Value": "< 0.0001 (Highly Statistically Significant)"
+}

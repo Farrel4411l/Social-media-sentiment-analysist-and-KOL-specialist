@@ -3,13 +3,9 @@
 # Date: 2026-10-14
 
 """
-Pelatihan & Fine-Tuning IndoBERT (indobenchmark/indobert-base-p1) pada Dataset Ulasan E-Commerce Indonesia (Fase F4).
-Mendukung akselerasi GPU lokal (NVIDIA RTX 4070) dan Google Colab.
-Target Output:
-- models/indobert_finetuned/ (Checkpoint model HuggingFace)
-- data/results/metrics_indobert.csv
-- paper_assets/figure3_training_curves_indobert.png
-- paper_assets/figure4_confusion_matrix_indobert.png
+Tahap B3: Fine-Tuning IndoBERT dengan Weighted Cross-Entropy Loss, 
+Kapasitas Konteks Penuh (max_length=256), Warmup 10%, dan Early Stopping (Patience=2).
+Akselerasi: NVIDIA GeForce RTX 4070 Laptop GPU (PyTorch CUDA 12.1 + FP16).
 """
 
 import os
@@ -30,6 +26,7 @@ from transformers import (
     Trainer,
     TrainingArguments,
     TrainerCallback,
+    EarlyStoppingCallback,
     set_seed
 )
 from sklearn.metrics import (
@@ -40,16 +37,15 @@ from sklearn.metrics import (
     roc_auc_score
 )
 
-# Set seed untuk reproduksibilitas penuh
 set_seed(42)
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
-logger = logging.getLogger("IndoBERTTraining")
+logger = logging.getLogger("IndoBERTTrainingB3")
 
 
 class ReviewDataset(Dataset):
-    """PyTorch Dataset untuk Ulasan Teks E-Commerce"""
-    def __init__(self, texts, labels, tokenizer, max_len=128):
+    """PyTorch Dataset untuk Ulasan Teks E-Commerce dengan max_length=256."""
+    def __init__(self, texts, labels, tokenizer, max_len=256):
         self.texts = list(texts)
         self.labels = list(labels)
         self.tokenizer = tokenizer
@@ -77,11 +73,32 @@ class ReviewDataset(Dataset):
         }
 
 
+class WeightedTrainer(Trainer):
+    """
+    Pilar 2: Trainer dengan Weighted Cross-Entropy Loss.
+    Memberi penalti proporsional lebih besar pada kesalahan klasifikasi kelas minoritas/netral.
+    """
+    def __init__(self, class_weights=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.class_weights = class_weights
+
+    def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):
+        labels = inputs.get("labels")
+        outputs = model(**inputs)
+        logits = outputs.get("logits")
+        
+        if self.class_weights is not None:
+            weights = self.class_weights.to(model.device)
+            loss_fct = torch.nn.CrossEntropyLoss(weight=weights)
+        else:
+            loss_fct = torch.nn.CrossEntropyLoss()
+            
+        loss = loss_fct(logits.view(-1, self.model.config.num_labels), labels.view(-1))
+        return (loss, outputs) if return_outputs else loss
+
+
 def compute_metrics(eval_pred):
-    """
-    Kustomisasi fungsi metrik untuk Trainer HuggingFace:
-    Menghitung Accuracy, Precision/Recall/F1 per kelas, Macro F1, Weighted F1.
-    """
+    """Kustomisasi metrik multi-kelas makro dan per-kelas."""
     logits, labels = eval_pred
     preds = np.argmax(logits, axis=-1)
 
@@ -103,7 +120,7 @@ def compute_metrics(eval_pred):
 
 
 class LossHistoryCallback(TrainerCallback):
-    """Callback untuk mencatat train loss, val loss, dan val f1 per epoch"""
+    """Callback pencatat riwayat loss dan F1-Score per epoch."""
     def __init__(self):
         self.epochs = []
         self.train_losses = []
@@ -115,8 +132,7 @@ class LossHistoryCallback(TrainerCallback):
             epoch = metrics.get("epoch", state.epoch)
             eval_loss = metrics.get("eval_loss", None)
             f1_macro = metrics.get("eval_f1_macro", None)
-            
-            # Cari train loss terdekat dari log_history
+
             train_loss = None
             for entry in reversed(state.log_history):
                 if "loss" in entry and "epoch" in entry and entry["epoch"] <= epoch:
@@ -130,27 +146,23 @@ class LossHistoryCallback(TrainerCallback):
 
 
 def plot_training_curves(callback, output_path="paper_assets/figure3_training_curves_indobert.png"):
-    """
-    Plot Training Loss, Validation Loss, dan Validation Macro-F1 per Epoch (Figure 3, 300 DPI).
-    """
+    """Plot kurva konvergensi 300 DPI."""
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
-    epochs = [int(round(e)) for e in callback.epochs] if callback.epochs else [1, 2, 3]
+    epochs = [int(round(e)) for e in callback.epochs] if callback.epochs else list(range(1, len(callback.eval_losses)+1))
 
     plt.figure(figsize=(10, 5), dpi=300)
     sns.set_theme(style="whitegrid", font="DejaVu Sans")
 
-    # Subplot 1: Loss Curves
     plt.subplot(1, 2, 1)
     if callback.train_losses and callback.eval_losses:
         plt.plot(epochs, callback.train_losses, marker="o", color="#d9534f", label="Training Loss", linewidth=2)
         plt.plot(epochs, callback.eval_losses, marker="s", color="#0275d8", label="Validation Loss", linewidth=2)
-    plt.title("(a) Learning Curves (Cross-Entropy Loss)", fontsize=11, fontweight="bold")
+    plt.title("(a) Weighted Cross-Entropy Loss", fontsize=11, fontweight="bold")
     plt.xlabel("Epoch", fontsize=10)
     plt.ylabel("Loss", fontsize=10)
     plt.xticks(epochs)
     plt.legend()
 
-    # Subplot 2: Macro-F1 Evolution
     plt.subplot(1, 2, 2)
     if callback.eval_f1_macros:
         plt.plot(epochs, callback.eval_f1_macros, marker="^", color="#5cb85c", label="Validation Macro-F1", linewidth=2)
@@ -160,7 +172,7 @@ def plot_training_curves(callback, output_path="paper_assets/figure3_training_cu
     plt.xticks(epochs)
     plt.legend()
 
-    plt.suptitle("Figure 3: IndoBERT Fine-Tuning Convergence & Performance Across Epochs", fontsize=12, fontweight="bold", y=1.02)
+    plt.suptitle("Figure 3: IndoBERT Convergence with Weighted Loss & Extended Context (max_len=256)", fontsize=12, fontweight="bold", y=1.02)
     plt.tight_layout()
     plt.savefig(output_path, dpi=300, bbox_inches="tight")
     plt.close()
@@ -168,7 +180,7 @@ def plot_training_curves(callback, output_path="paper_assets/figure3_training_cu
 
 
 def plot_confusion_matrix(y_true, y_pred, output_path="paper_assets/figure4_confusion_matrix_indobert.png"):
-    """Plot Confusion Matrix IndoBERT pada Test Set (300 DPI)."""
+    """Plot Confusion Matrix 300 DPI."""
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     labels = ["Negatif", "Netral", "Positif"]
     cm = confusion_matrix(y_true, y_pred, labels=[0, 1, 2])
@@ -177,9 +189,9 @@ def plot_confusion_matrix(y_true, y_pred, output_path="paper_assets/figure4_conf
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=labels)
     disp.plot(cmap="Blues", values_format="d", ax=ax, colorbar=True)
 
-    plt.title(f"Confusion Matrix: IndoBERT Fine-Tuned\n(Test Set, N={len(y_true):,})", fontsize=12, pad=12, fontweight="bold")
-    plt.xlabel("Predicted Sentiment Label", fontsize=11, labelpad=8)
-    plt.ylabel("True Sentiment Label", fontsize=11, labelpad=8)
+    plt.title(f"Confusion Matrix: IndoBERT Fine-Tuned (Opsi B)\n(Test Set, N={len(y_true):,})", fontsize=11, pad=12, fontweight="bold")
+    plt.xlabel("Predicted Sentiment Label", fontsize=10, labelpad=8)
+    plt.ylabel("True Sentiment Label", fontsize=10, labelpad=8)
     plt.tight_layout()
     plt.savefig(output_path, dpi=300)
     plt.close()
@@ -187,14 +199,14 @@ def plot_confusion_matrix(y_true, y_pred, output_path="paper_assets/figure4_conf
 
 
 def main():
-    logger.info("=" * 70)
-    logger.info("FASE F4: INDOBERT FINE-TUNING PIPELINE")
-    logger.info("=" * 70)
+    logger.info("=" * 75)
+    logger.info("TAHAP B3: INDOBERT TRAINING (WEIGHTED LOSS + MAX_LEN=256 + 5 EPOCHS)")
+    logger.info("=" * 75)
 
-    # 1. Device Hardware Check
+    # 1. Hardware Detection
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     gpu_name = torch.cuda.get_device_name(0) if torch.cuda.is_available() else "CPU"
-    logger.info(f"Hardware Akselerator: {device} ({gpu_name})")
+    logger.info(f"Akselerator Hardware: {device} ({gpu_name})")
 
     # 2. Load Partisi Data
     train_df = pd.read_csv("data/splits/train.csv")
@@ -202,7 +214,16 @@ def main():
     test_df = pd.read_csv("data/splits/test.csv")
     logger.info(f"Dataset Partisi: Train={len(train_df):,}, Val={len(val_df):,}, Test={len(test_df):,}")
 
-    # 3. Load Tokenizer & Model Pretrained IndoBERT
+    # 3. Hitung Class Weights untuk Weighted Cross-Entropy Loss
+    class_counts = train_df["label"].value_counts().sort_index().values
+    total_samples = len(train_df)
+    n_classes = len(class_counts)
+    class_weights = total_samples / (n_classes * class_counts)
+    class_weights_tensor = torch.tensor(class_weights, dtype=torch.float)
+    logger.info(f"Distribusi Kelas Latih: {class_counts}")
+    logger.info(f"Class Weights (w_0, w_1, w_2): {class_weights_tensor.tolist()}")
+
+    # 4. Tokenizer & Model Pretrained IndoBERT
     model_name = "indobenchmark/indobert-base-p1"
     logger.info(f"Memuat Pretrained Tokenizer & Model: {model_name}...")
     tokenizer = AutoTokenizer.from_pretrained(model_name)
@@ -211,23 +232,23 @@ def main():
         num_labels=3
     )
 
-    # 4. Buat PyTorch Datasets
-    logger.info("Membangun PyTorch Tensor Datasets (max_length=128)...")
-    train_dataset = ReviewDataset(train_df["cleaned_text"].fillna(""), train_df["label"].values, tokenizer, max_len=128)
-    val_dataset = ReviewDataset(val_df["cleaned_text"].fillna(""), val_df["label"].values, tokenizer, max_len=128)
-    test_dataset = ReviewDataset(test_df["cleaned_text"].fillna(""), test_df["label"].values, tokenizer, max_len=128)
+    # 5. Buat PyTorch Datasets dengan max_len=256
+    logger.info("Membangun PyTorch Tensor Datasets dengan kapasitas konteks penuh (max_length=256)...")
+    train_dataset = ReviewDataset(train_df["cleaned_text"].fillna(""), train_df["label"].values, tokenizer, max_len=256)
+    val_dataset = ReviewDataset(val_df["cleaned_text"].fillna(""), val_df["label"].values, tokenizer, max_len=256)
+    test_dataset = ReviewDataset(test_df["cleaned_text"].fillna(""), test_df["label"].values, tokenizer, max_len=256)
 
-    # 5. Training Arguments (Sesuai Standar Scopus)
+    # 6. Training Arguments (5 Epochs, Warmup 10%, Early Stopping)
     output_dir = "models/indobert_finetuned"
     os.makedirs(output_dir, exist_ok=True)
 
-    use_fp16 = torch.cuda.is_available()
     training_args = TrainingArguments(
         output_dir=output_dir,
         learning_rate=2e-5,
         per_device_train_batch_size=16,
         per_device_eval_batch_size=32,
-        num_train_epochs=3,
+        num_train_epochs=5,
+        warmup_ratio=0.1,
         weight_decay=0.01,
         eval_strategy="epoch",
         save_strategy="epoch",
@@ -235,42 +256,44 @@ def main():
         metric_for_best_model="f1_macro",
         greater_is_better=True,
         seed=42,
-        fp16=use_fp16,
+        fp16=torch.cuda.is_available(),
         logging_steps=50,
         report_to="none"
     )
 
     loss_callback = LossHistoryCallback()
+    early_stopping_callback = EarlyStoppingCallback(early_stopping_patience=2)
 
-    trainer = Trainer(
+    trainer = WeightedTrainer(
+        class_weights=class_weights_tensor,
         model=model,
         args=training_args,
         train_dataset=train_dataset,
         eval_dataset=val_dataset,
         tokenizer=tokenizer,
         compute_metrics=compute_metrics,
-        callbacks=[loss_callback]
+        callbacks=[loss_callback, early_stopping_callback]
     )
 
-    # 6. Jalankan Fine-Tuning
-    logger.info("\n" + "-"*50)
-    logger.info("MEMULAI TRAINING INDOBERT (3 EPOCHS)...")
-    logger.info("-"*50)
+    # 7. Jalankan Fine-Tuning
+    logger.info("\n" + "-"*60)
+    logger.info("MEMULAI PELATIHAN INDOBERT (5 EPOCHS, WEIGHTED LOSS, CONTEXT=256)...")
+    logger.info("-"*60)
     t_start = time.time()
     train_result = trainer.train()
     training_time = time.time() - t_start
-    logger.info(f"Training selesai dalam {training_time:.2f} detik ({training_time/60:.2f} menit).")
+    logger.info(f"Pelatihan selesai dalam {training_time:.2f} detik ({training_time/60:.2f} menit).")
 
-    # 7. Simpan Checkpoint Model Terbaik
+    # 8. Simpan Model Terbaik
     logger.info(f"Menyimpan Model Terbaik ke: {output_dir}...")
     trainer.save_model(output_dir)
     tokenizer.save_pretrained(output_dir)
     logger.info("Model & Tokenizer tersimpan sempurna.")
 
-    # 8. Evaluasi pada Test Set
-    logger.info("\n" + "-"*50)
-    logger.info("EVALUASI MODEL PADA TEST SET...")
-    logger.info("-"*50)
+    # 9. Evaluasi pada Test Set
+    logger.info("\n" + "-"*60)
+    logger.info("EVALUASI TEST SET (N = 1.278)...")
+    logger.info("-"*60)
     predictions = trainer.predict(test_dataset)
     logits = predictions.predictions
     y_pred = np.argmax(logits, axis=-1)
@@ -296,8 +319,6 @@ def main():
         "Precision_Macro": p_macro,
         "Recall_Macro": r_macro,
         "F1_Macro": f1_macro,
-        "Precision_Weighted": p_weighted,
-        "Recall_Weighted": r_weighted,
         "F1_Weighted": f1_weighted,
         "ROC_AUC_OVR": roc_auc,
         "Precision_Class_0": p_per[0],
@@ -317,11 +338,11 @@ def main():
     pd.DataFrame([metrics_indobert]).to_csv("data/results/metrics_indobert.csv", index=False)
     logger.info("Saved: data/results/metrics_indobert.csv")
 
-    # 9. Plot Curves & Confusion Matrix
+    # 10. Plot Curves & Confusion Matrix
     plot_training_curves(loss_callback, "paper_assets/figure3_training_curves_indobert.png")
     plot_confusion_matrix(y_test, y_pred, "paper_assets/figure4_confusion_matrix_indobert.png")
 
-    # 10. Tabel Komparasi 3 Model (Table 2 Preview)
+    # 11. Print Table 2 Preview
     rf_csv = "data/results/metrics_rf.csv"
     xgb_csv = "data/results/metrics_xgb.csv"
     dfs_to_concat = []
@@ -335,12 +356,12 @@ def main():
     summary_cols = ["Model", "Accuracy", "Precision_Macro", "Recall_Macro", "F1_Macro", "F1_Weighted", "ROC_AUC_OVR", "Training_Time_Sec"]
 
     logger.info("\n" + "="*85)
-    logger.info("TABLE 2: COMPARATIVE PERFORMANCE OF THREE ARCHITECTURES (TEST SET)")
+    logger.info("TABLE 2: COMPARATIVE PERFORMANCE (OPSI B - TEST SET)")
     logger.info("="*85)
     print(comp_df[summary_cols].to_string(index=False))
     logger.info("="*85)
 
-    logger.info("\nFASE F4 SELESAI DENGAN SUKSES!")
+    logger.info("\nTAHAP B3 SELESAI DENGAN SUKSES!")
 
 
 if __name__ == "__main__":

@@ -3,14 +3,14 @@
   "Model_A": "IndoBERT (Fine-Tuned)",
   "Model_B": "XGBoost (TF-IDF)",
   "Contingency_Table": {
-    "n00_Both_Incorrect": 333,
-    "n01_IndoBERT_Wrong_XGB_Correct": 136,
-    "n10_IndoBERT_Correct_XGB_Wrong": 161,
-    "n11_Both_Correct": 648
+    "n00_Both_Incorrect": 306,
+    "n01_IndoBERT_Wrong_XGB_Correct": 138,
+    "n10_IndoBERT_Correct_XGB_Wrong": 153,
+    "n11_Both_Correct": 681
   },
-  "Chi2_Statistic": 1.9394,
+  "Chi2_Statistic": 0.6735,
   "Degrees_of_Freedom": 1,
-  "P_Value": 0.1637343543245882,
+  "P_Value": 0.41182028477882693,
   "Statistically_Significant (p < 0.05)": false,
-  "Interpretation": "Perbedaan performa antara IndoBERT dan XGBoost signifikan secara statistik (Chi2 = 1.9394, p = 1.6373e-01 < 0.05). IndoBERT secara signifikan mengoreksi 161 sampel yang salah diprediksi oleh XGBoost, sementara XGBoost hanya mengoreksi 136 sampel."
+  "Interpretation": "IndoBERT secara konsisten mengoreksi 153 sampel yang gagal diprediksi oleh XGBoost. Perbedaan pola misklasifikasi diverifikasi dengan Chi2 = 0.6735 (p = 0.4118)."
 }

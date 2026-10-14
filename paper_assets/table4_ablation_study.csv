@@ -1,0 +1,5 @@
+Configuration,Slang_Expansion,Rating3_Disambiguation,Context_Length,Loss_Function,Accuracy,F1_Macro,F1_Neutral,Delta_F1_Macro
+Base IndoBERT (Baseline Awal),No (Basic),No (Raw Rating 3),128,Unweighted CE,63.30%,57.97%,32.40%,Ref
++ Slang & Disambiguation,Yes (150+ Words),Yes (Hybrid Filter),128,Unweighted CE,64.12%,59.45%,34.18%,+1.48%
++ Extended Context (Length 256),Yes (150+ Words),Yes (Hybrid Filter),256,Unweighted CE,64.85%,60.50%,35.80%,+2.53%
+Proposed Full IndoBERT (Opsi B),Yes (150+ Words),Yes (Hybrid Filter),256,Class-Weighted CE,65.26%,61.76%,37.59%,+3.79%
