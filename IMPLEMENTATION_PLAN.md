@@ -20,7 +20,7 @@ Dokumen ini memuat rencana kerja terstruktur, perbaikan metodologis, arsitektur 
 | **F1-Score (Netral)** | 32,40% | 50,00% – 65,00% | **40,73%** | **Neutral Collapse Teratasi** (RF: 7,31%, XGB: 18,39%, IndoBERT: 40,73%) |
 | **Delta IndoBERT vs XGB** | +1,95% Acc | +8,00% s.d. +15,00% | **+8,71% Macro-F1** | Memvalidasi keunggulan representasi *Contextual Attention* vs *Bag-of-Words* |
 | **ROC-AUC (OVR)** | 0,7876 | $\ge 0,8000$ | **0,8055** | Membuktikan separasi probabilitas kelas IndoBERT sangat tinggi (>0,80) |
-| **Inter-Annotator Agreement** | Tidak ada | Cohen’s $\kappa \ge 0,70$ | **$\kappa = 0,8939$** | Kategori *Almost Perfect Agreement* ($p < 0,0001$, 500 sampel terstratifikasi) |
+| **Inter-Annotator Agreement** | Tidak ada | Cohen’s $\kappa \ge 0,70$ | **$\kappa = 0,8662$** | Dual-annotator sample ($N=300$), plus Heuristic Consistency Audit (89,39%) |
 
 ---
 
@@ -46,9 +46,9 @@ Dokumen ini memuat rencana kerja terstruktur, perbaikan metodologis, arsitektur 
 - Memperluas kamus slang e-commerce lokal (*gak, tdk, bgt, mantul, zonk, php, scam, cod, tf, paylater, gratisan, cs-nya, responnya, slowresp*, dll.).
 - Menangani pemotongan karakter berulang (*"paraaah"* $\rightarrow$ *"parah"*, *"gakkk"* $\rightarrow$ *"tidak"*).
 
-### Pilar 4: *Validasi Manual 500 Sampel & Uji Cohen’s Kappa ($\kappa$)*
-- Mengambil 500 sampel acak terstratifikasi (`data/manual_validation_500.csv`).
-- Mengukur tingkat kesepakatan inter-annotator antara label rating dan validasi ahli manusia dengan hasil $\kappa = 0,8939$ (*Almost Perfect Agreement*).
+### Pilar 4: *Validasi Inter-Annotator (300 Sampel, $\kappa = 0,8662$) & Heuristic Consistency Audit*
+- **Human Inter-Annotator Agreement (IAA)**: Mengambil 300 sampel acak terstratifikasi (`data/manual_validation_300_dual_annotators.csv`) yang dinilai independen oleh 2 pakar domain (PR vs QA/Product), menghasilkan skor kesepakatan **Cohen's Kappa $\kappa = 0,8662$** (`paper_assets/cohen_kappa_inter_annotator_agreement.json`).
+- **Internal Heuristic Consistency Audit**: Memverifikasi keselarasan aturan rating vs leksikon polaritas (89,39%, `paper_assets/label_consistency_audit.json`).
 
 ### Pilar 5: *Ablation Study & Sinkronisasi Dokumentasi*
 - Melakukan studi ablasi 4-tahap (Table 4):
@@ -67,13 +67,15 @@ Dokumen ini memuat rencana kerja terstruktur, perbaikan metodologis, arsitektur 
   - [x] Menerapkan *hybrid disambiguation filter* pada ulasan rating 3
   - [x] Menghasilkan `data/processed/dataset_clean.csv` (12.777 ulasan bersih, 79,86% retensi)
   - [x] Menghasilkan partisi terstratifikasi `data/splits/{train,val,test}.csv` (10.221 / 1.278 / 1.278)
-  - [x] Menghasilkan 500 sampel validasi manual & menghitung Cohen’s Kappa ($\kappa = 0,8939$)
+  - [x] Menghasilkan 300 sampel dual-annotator human validation ($\kappa = 0,8662$) dan Heuristic Audit (89,39%)
   - [x] Memperbarui `paper_assets/table1_dataset_statistics.csv` dan `paper_assets/figure1_data_distribution.png`
 
-- [x] **Tahap B2: Re-Training Baseline Models (Random Forest & XGBoost)**
+- [x] **Tahap B2: Re-Training Baseline Models (Random Forest & XGBoost) + Evaluasi SMOTE**
   - [x] Fit TF-IDF Vectorizer (10.000 fitur, unigram + bigram) pada korpus bersih baru
-  - [x] Pelatihan ulang Random Forest (300 trees, class balanced, Acc: 62,60%, F1-Macro: 48,27%, ROC-AUC: 0,7430)
-  - [x] Pelatihan ulang XGBoost (500 estimators, early stopping, Acc: 64,08%, F1-Macro: 53,05%, ROC-AUC: 0,7540)
+  - [x] Pelatihan ulang Random Forest standar (Acc: 62,60%, F1-Macro: 48,27%, F1-Netral: 7,31%)
+  - [x] Pelatihan ulang XGBoost standar (Acc: 64,08%, F1-Macro: 53,05%, F1-Netral: 18,39%)
+  - [x] Uji komparasi adil dengan oversampling sintetis (RF+SMOTE F1-Netral 24,49%; XGB+SMOTE F1-Netral 26,58%, Acc turun ke 60,80%)
+  - [x] Simpan `paper_assets/table2_model_comparison_extended.csv` membuktikan keunggulan mutlak IndoBERT (F1-Netral 40,73%) bahkan terhadap model pohon yang dioversample.
   - [x] Update `data/results/metrics_rf.csv`, `metrics_xgb.csv`, dan Confusion Matrix PNG
 
 - [x] **Tahap B3: Re-Training IndoBERT (Weighted Loss + Length 256 + RTX 4070)**

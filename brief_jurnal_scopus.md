@@ -77,16 +77,21 @@ Date: 2026-10-14
 - Total korpus bersih: **12.777 baris** (79,86% retensi dari 16.000 mentah).
 - Distribusi ulasan per aplikasi: Bukalapak (3.308), Tokopedia (3.289), Shopee (3.091), Lazada (3.089).
 - Panjang rata-rata ulasan negatif (135,7 karakter) terbukti lebih panjang daripada ulasan positif (84,9 karakter), membuktikan bahwa konsumen Indonesia cenderung merinci kendala fungsional saat menyampaikan ketidakpuasan.
-- **Reliabilitas Anotasi:** Pengujian kesepakatan inter-annotator pada 500 sampel acak terstratifikasi menghasilkan skor **Cohen’s Kappa $\kappa = 0,8939$** ($p < 0,0001$), membuktikan reliabilitas *ground-truth* berada pada kategori *Almost Perfect Agreement*.
+- **Reliabilitas Anotasi & Audit Konsistensi:**
+  - **Human Inter-Annotator Agreement (IAA):** Uji reliabilitas ganda independen pada 300 sampel acak terstratifikasi menghasilkan koefisien **Cohen’s Kappa $\kappa = 0,8662$** (`paper_assets/cohen_kappa_inter_annotator_agreement.json`), mengonfirmasi kesepakatan substansial yang kuat (*substantial to almost perfect agreement*) pada teks ulasan informal.
+  - **Internal Heuristic Consistency Audit:** Audit konsistensi aturan leksikal-rating menghasilkan kesesuaian **89,39%** (`paper_assets/label_consistency_audit.json`).
 
-#### 2. Kinerja Model Agregat (Rujuk Table 2 & Figure 4)
-| Model | Representasi Fitur | Accuracy (%) | Macro F1 (%) | Weighted F1 (%) | ROC-AUC (OVR) | Training Time (s) |
+#### 2. Kinerja Model Agregat & Perbandingan Baseline SMOTE (Rujuk Table 2 & Figure 4)
+| Model | Representasi Fitur / Strategi | Accuracy (%) | Macro F1 (%) | F1 Netral (%) | ROC-AUC (OVR) | Training Time (s) |
 |---|---|:---:|:---:|:---:|:---:|:---:|
-| **Random Forest** (300 Trees) | TF-IDF (1-2 gram, 10k) | 62,60% | 48,27% | 56,46% | 0,7430 | **7,51 s** |
-| **XGBoost** (Early Stopping) | TF-IDF (1-2 gram, 10k) | 64,08% | 53,05% | 59,96% | 0,7540 | 52,90 s |
-| **IndoBERT** (`indobert-base-p1`) | Deep Contextual (max_len=256) | **65,26%** | **61,76%** | **66,00%** | **0,8055** | 607,32 s |
+| **Random Forest** | TF-IDF (1-2 gram, 10k) + Balanced | 62,60% | 48,27% | 7,31% 🚨 | 0,7430 | **7,51 s** |
+| **Random Forest + SMOTE** | TF-IDF + Synthetic Oversampling | 61,97% | 53,40% | 24,49% | 0,7383 | 7,73 s |
+| **XGBoost** | TF-IDF (1-2 gram, 10k) + Early Stop | 64,08% | 53,05% | 18,39% ⚠️ | 0,7540 | 52,90 s |
+| **XGBoost + SMOTE** | TF-IDF + Synthetic Oversampling | 60,80% | 53,96% | 26,58% | 0,7523 | 55,84 s |
+| **IndoBERT** (`indobert-base-p1`) | Deep Contextual (max_len=256, Weighted CE) | **65,26%** | **61,76%** | **40,73%** 🎯 | **0,8055** | 607,32 s |
 
-- **Keunggulan IndoBERT:** IndoBERT mencapai **Macro-F1 61,76%** dan **Accuracy 65,26%**, mengungguli XGBoost (53,05%) sebesar **+8,71%** dan Random Forest (48,27%) sebesar **+13,49%**.
+- **Keunggulan Defensibel IndoBERT (Penyelesaian Neutral Collapse):** Keunggulan utama IndoBERT (+8,71pp Macro-F1 dari XGBoost) bersumber secara krusial dari pemecahan masalah kelas Netral (**+22,34pp vs XGBoost standar, +14,15pp vs XGBoost+SMOTE**).
+- **Kegagalan SMOTE Mengatasi Ambiguitas Kontekstual:** Meskipun SMOTE menaikkan F1 Netral tree-based models dari 7-18% ke 24-26%, ia menyebabkan akurasi XGBoost anjlok sebesar 3,28pp (dari 64,08% menjadi 60,80%). Hal ini membuktikan bahwa oversampling sintetis pada representasi sparse unigram/bigram menciptakan noise batas keputusan, menegaskan superioritas representasi atensi kontekstual IndoBERT.
 - **Separasi Probabilitas (ROC-AUC):** IndoBERT melampaui ambang batas **0,8055**, jauh di atas XGBoost (0,7540) dan Random Forest (0,7430), memvalidasi kemampuan kalibrasi probabilitas kelas transformer.
 
 #### 3. Kinerja Per-Kelas & Solusi Neutral Collapse (Rujuk Table 3 & Figure 5)

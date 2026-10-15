@@ -1,0 +1,7 @@
+{
+  "Evaluation_Type": "Internal Heuristic & Rule Consistency Audit",
+  "Sample_Size": 500,
+  "Methodology": "Verification between initial rating heuristics and lexicon-based polarity rules",
+  "Consistency_Agreement_Score": 0.8939,
+  "Disclaimer": "This metric represents algorithmic self-consistency between rating brackets and sentiment lexicon rules during data cleaning, distinct from independent human inter-annotator agreement."
+}

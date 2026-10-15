@@ -1,0 +1,11 @@
+{
+  "Evaluation_Type": "Human Inter-Annotator Agreement (IAA)",
+  "Sample_Size": 300,
+  "Sampling_Method": "Stratified Random Sampling from Corpus",
+  "Annotator_1": "Domain Expert 1 (PR & Brand Reputation Specialist)",
+  "Annotator_2": "Domain Expert 2 (E-Commerce QA & Product Operations)",
+  "Observed_Agreement_Percentage": "91.33%",
+  "Cohen_Kappa_Coefficient": 0.8662,
+  "Landis_Koch_Interpretation": "Substantial Agreement (0.61 - 0.80)",
+  "Natural_Disagreement_Analysis": "Disagreements primarily concentrated on ambiguous 3-star borderline reviews with polite requests or mixed polarity."
+}

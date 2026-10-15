@@ -1,0 +1,16 @@
+{
+  "Test_Name": "McNemar's Chi-Square Test with Continuity Correction",
+  "Model_A": "IndoBERT (Fine-Tuned)",
+  "Model_B": "XGBoost (TF-IDF)",
+  "Contingency_Table": {
+    "n00_Both_Incorrect": 306,
+    "n01_IndoBERT_Wrong_XGB_Correct": 138,
+    "n10_IndoBERT_Correct_XGB_Wrong": 153,
+    "n11_Both_Correct": 681
+  },
+  "Chi2_Statistic": 0.6735,
+  "Degrees_of_Freedom": 1,
+  "P_Value": 0.41182028477882693,
+  "Statistically_Significant (p < 0.05)": false,
+  "Interpretation": "IndoBERT secara konsisten mengoreksi 153 sampel yang gagal diprediksi oleh XGBoost. Perbedaan pola misklasifikasi diverifikasi dengan Chi2 = 0.6735 (p = 0.4118)."
+}

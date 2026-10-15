@@ -1,0 +1,6 @@
+Model,Balancing_Strategy,Accuracy,Precision (macro),Recall (macro),F1 (macro),F1 (weighted),F1 (Neutral),ROC-AUC (OVR),Training Time (s)
+Random Forest (TF-IDF),Class-Weight Balanced,62.60%,54.51%,51.61%,48.27%,56.46%,7.31%,0.7430,7.51
+Random Forest + SMOTE,Synthetic Oversampling (SMOTE),61.97%,53.28%,53.52%,53.40%,60.12%,24.49%,0.7383,7.73
+XGBoost (TF-IDF),Early Stopping Default,64.08%,57.78%,54.54%,53.05%,59.96%,18.39%,0.7540,52.90
+XGBoost + SMOTE,Synthetic Oversampling (SMOTE),60.80%,54.12%,53.80%,53.96%,59.45%,26.58%,0.7523,55.84
+IndoBERT (Proposed),Class-Weighted Cross-Entropy Loss,65.26%,63.32%,61.34%,61.76%,66.00%,40.73%,0.8055,607.32
