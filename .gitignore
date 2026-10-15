@@ -42,3 +42,4 @@ models/rf_tfidf.pkl
 *.pt
 *.pth
 models/indobert_finetuned/checkpoint-*/
+models/indobertweet_finetuned/checkpoint-*/

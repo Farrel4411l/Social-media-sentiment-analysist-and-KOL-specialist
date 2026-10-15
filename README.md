@@ -1,7 +1,7 @@
 <!-- 
 Author: Muhammad Farrel Haidar
 Project: AI PR & KOL Specialist DSS & Comparative Research Pipeline
-Date: 2026-10-14
+Date: 2026-10-15
 -->
 
 # AI PR & KOL Specialist: Decision Support System & Empirical Research Pipeline
@@ -60,9 +60,11 @@ Riset ini mengevaluasi keandalan model *Contextual Transformer* versus *Tree-Bas
 | **Random Forest + SMOTE** | TF-IDF + Synthetic Oversampling | 61.97% | 53.40% | 24.49% | 0.7383 | 7.73 s |
 | **XGBoost** | TF-IDF (1-2 gram, 10k) + Early Stop | 64.08% | 53.05% | 18.39% ⚠️ | 0.7540 | 52.90 s |
 | **XGBoost + SMOTE** | TF-IDF + Synthetic Oversampling | 60.80% | 53.96% | 26.58% | 0.7523 | 55.84 s |
-| **IndoBERT** (`indobert-base-p1`) | Deep Contextual (max_len=256, Weighted CE) | **65.26%** | **61.76%** | **40.73%** 🎯 | **0.8055** | 607.32 s |
+| **IndoBERT (base-p1)** | Deep Contextual (max_len=256, Weighted CE) | **65.26%** 🏆 | **61.76%** 🏆 | **40.73%** 🎯 | **0.8055** 🏆 | 607.32 s |
+| **IndoBERTweet (uncased)** | Deep Contextual (max_len=256, Weighted CE) | 63.46% | 61.23% | **42.23%** 🚀 | 0.8016 | 436.06 s |
 
-- **Temuan Kunci (Penyelesaian Neutral Collapse)**: Keunggulan signifikan IndoBERT terutama bersumber dari keberhasilan memecahkan kegagalan batas keputusan (*decision boundary*) pada kelas Netral. IndoBERT mencapai **F1 Netral 40.73%**, unggul masif **+22.34pp** di atas XGBoost standar (18.39%) dan **+14.15pp** di atas XGBoost dengan SMOTE (26.58%).
+- **Temuan Kunci (Penyelesaian Neutral Collapse)**: Keunggulan signifikan IndoBERT terutama bersumber dari keberhasilan memecahkan kegagalan batas keputusan (*decision boundary*) pada kelas Netral. IndoBERT-base mencapai **F1 Netral 40.73%**, unggul masif **+22.34pp** di atas XGBoost standar (18.39%) dan **+14.15pp** di atas XGBoost dengan SMOTE (26.58%).
+- **Eksplorasi Varian IndoBERTweet**: Model yang di-pretrain khusus pada media sosial informal Indonesia menghasilkan **F1 Netral tertinggi (42.23%)**, membuktikan adaptabilitas tinggi pada kosakata gaul, sementara IndoBERT-base tetap menjadi juara global (Akurasi 65.26%) pada ulasan komplain transaksional panjang.
 - **Keterbatasan SMOTE pada Sparse N-Grams**: Eksperimen membuktikan bahwa oversampling sintetis (SMOTE) pada TF-IDF hanya menaikkan F1 Netral secara terbatas dan justru menurunkan akurasi total XGBoost (dari 64.08% menjadi 60.80%), memvalidasi bahwa hanya mekanisme *Bidirectional Self-Attention* yang mampu membedakan ulasan netral/ambigu secara stabil.
 - **Integritas Anotasi & Uji Reliabilitas**:
   - **Human Inter-Annotator Agreement (IAA)**: 300 sampel acak terstratifikasi diuji independen oleh 2 penilai domain menghasilkan skor **Cohen’s Kappa $\kappa = 0.8662$** (`paper_assets/cohen_kappa_inter_annotator_agreement.json`).
@@ -99,16 +101,19 @@ cobapenelitianpart4/
 │   ├── budget_predictor.py         # Regresi Budget KOL
 │   ├── sentiment_engine.py         # Mesin Sentimen & Aspek
 │   ├── slm_generator.py            # Integrasi LLM/SLM Brief Generator
-│   ├── tfidf_vectorizer.pkl        # TF-IDF Feature Extractor
-│   ├── xgb_tfidf.pkl               # Model XGBoost Classifier
-│   ├── indobert_finetuned/         # Tokenizer & Konfigurasi IndoBERT
+│   ├── tfidf_vectorizer.pkl        # TF-IDF Feature Extractor (10.000 fitur)
+│   ├── rf_tfidf.pkl                # Random Forest Classifier weights
+│   ├── xgb_tfidf.pkl               # Model XGBoost Classifier weights
+│   ├── indobert_finetuned/         # Checkpoint Model & Tokenizer IndoBERT-base
+│   ├── indobertweet_finetuned/     # Checkpoint Model & Tokenizer IndoBERTweet
 │   └── README.md                   # Panduan model & weights
 │
 ├── data/                            # Dataset & Vectorstore
-│   ├── raw/                        # CSV ulasan mentah Play Store
+│   ├── raw/                        # CSV ulasan mentah Play Store (16.000 baris)
 │   ├── processed/                  # Dataset ulasan bersih (12.777 baris)
-│   ├── splits/                     # Stratified Train, Val, Test splits
-│   ├── results/                    # Hasil metrik evaluasi model
+│   ├── splits/                     # Stratified Train (10.221), Val (1.278), Test (1.278)
+│   ├── manual_validation_300_dual_annotators.csv # 300 sampel validasi ganda manusia
+│   ├── results/                    # Hasil metrik evaluasi model lengkap
 │   ├── chroma_db/                  # Local Chroma vector database
 │   └── budget_model.joblib         # Model serialisasi budget
 │
@@ -123,17 +128,26 @@ cobapenelitianpart4/
 │   ├── run_preprocessing.py
 │   ├── train_baseline_rf_xgb.py
 │   ├── train_indobert.py
+│   ├── train_indobertweet.py
 │   └── run_comparative_analysis.py
 │
 ├── paper_assets/                    # Visualisasi Ilmiah Siap Terbit (300 DPI)
 │   ├── figure1_data_distribution.png
 │   ├── figure2_wordcloud_per_class.png
 │   ├── figure3_training_curves_indobert.png
+│   ├── figure3_training_curves_indobertweet.png
 │   ├── figure4_confusion_matrix_comparison.png
+│   ├── figure4_confusion_matrix_indobert.png
+│   ├── figure4_confusion_matrix_indobertweet.png
 │   ├── figure5_f1_comparison_barplot.png
 │   ├── table1_dataset_statistics.csv
 │   ├── table2_model_comparison.csv
+│   ├── table2_model_comparison_extended.csv
 │   ├── table3_per_class_metrics.csv
+│   ├── table4_ablation_study.csv
+│   ├── cohen_kappa_inter_annotator_agreement.json
+│   ├── label_consistency_audit.json
+│   ├── mcnemar_test.json
 │   └── error_analysis_samples.csv
 │
 ├── src/                             # Simulasi Java OOP
@@ -143,6 +157,7 @@ cobapenelitianpart4/
 │       └── GoodKolCampaignEngine.java
 │
 ├── brief_jurnal_scopus.md           # Brief penulisan artikel ilmiah Scopus
+├── IMPLEMENTATION_PLAN.md           # Pelacakan implementasi & justifikasi akademik
 ├── README_reproducibility.md        # Panduan teknis eksekusi riset ulang
 ├── PRESENTASI_DOSEN.md              # Materi presentasi akademik/dosen
 ├── requirements.txt                 # Dependensi Python

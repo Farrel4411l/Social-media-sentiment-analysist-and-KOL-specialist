@@ -1,7 +1,7 @@
 <!--
 Author: Muhammad Farrel Haidar
 Project: AI PR & KOL Specialist DSS
-Date: 2026-10-14
+Date: 2026-10-15
 -->
 
 # MASTER IMPLEMENTATION PLAN (OPSI B: JALUR KOMPREHENSIF)
@@ -112,28 +112,36 @@ cobapenelitianpart4/
 ├── paper_assets/                                # Aset Gambar & Tabel Ilmiah (300 DPI)
 │   ├── table1_dataset_statistics.csv            # Tabel 1: Distribusi korpus ulasan e-commerce
 │   ├── table2_model_comparison.csv              # Tabel 2: Komparasi metrik RF vs XGB vs IndoBERT
+│   ├── table2_model_comparison_extended.csv     # Tabel 2 Extended: Evaluasi SMOTE pada RF & XGB
+│   ├── table2_model_comparison_with_indobertweet.csv # Tabel 2 Lengkap: Benchmark 6 Model
 │   ├── table3_per_class_metrics.csv             # Tabel 3: Metrik per kelas (Negatif, Netral, Positif)
 │   ├── table4_ablation_study.csv                # Tabel 4: Studi ablasi 4 konfigurasi
 │   ├── figure1_data_distribution.png            # Gambar 1: Distribusi rating dan sentimen per aplikasi
 │   ├── figure2_wordcloud_per_class.png          # Gambar 2: Word cloud leksikal per polaritas sentimen
-│   ├── figure3_training_curves_indobert.png     # Gambar 3: Kurva konvergensi IndoBERT (Loss & Val F1)
+│   ├── figure3_training_curves_indobert.png     # Gambar 3: Kurva konvergensi IndoBERT-base
+│   ├── figure3_training_curves_indobertweet.png # Gambar 3b: Kurva konvergensi IndoBERTweet
 │   ├── figure4_confusion_matrix_comparison.png  # Gambar 4: Confusion matrix komparasi berdampingan
+│   ├── figure4_confusion_matrix_indobert.png    # Confusion matrix IndoBERT
+│   ├── figure4_confusion_matrix_indobertweet.png# Confusion matrix IndoBERTweet
 │   ├── figure5_f1_comparison_barplot.png        # Gambar 5: Barplot komparasi F1-Score per kelas
-│   ├── cohen_kappa_validation.json              # Koefisien kesepakatan inter-annotator (kappa = 0.8939)
-│   ├── mcnemar_test_result.json                 # Hasil uji signifikansi statistik McNemar
+│   ├── cohen_kappa_inter_annotator_agreement.json # Validasi independen 2 penilai (kappa = 0.8662)
+│   ├── label_consistency_audit.json             # Audit konsistensi aturan leksikal-rating (89.39%)
+│   ├── mcnemar_test.json                        # Hasil uji signifikansi statistik McNemar (chi2 = 0.6735)
 │   └── error_analysis_samples.csv               # 20 kasus linguistik mendalam (sarkasme, negasi ganda)
 │
 ├── data/
 │   ├── raw/                                     # Data mentah 16.000 ulasan Play Store
 │   ├── processed/dataset_clean.csv              # Data bersih 12.777 ulasan
-│   ├── splits/{train,val,test}.csv              # Stratified split 80/10/10
-│   └── manual_validation_500.csv                # 500 sampel validasi manual ground-truth
+│   ├── splits/{train,val,test}.csv              # Stratified split 80/10/10 (10.221 / 1.278 / 1.278)
+│   └── manual_validation_300_dual_annotators.csv# 300 sampel validasi ganda manusia (IAA)
 │
 ├── models/
 │   ├── tfidf_vectorizer.pkl                     # Vectorizer TF-IDF 10k fitur
 │   ├── rf_tfidf.pkl                             # Random Forest Classifier weights
 │   ├── xgb_tfidf.pkl                            # XGBoost Classifier weights
-│   └── indobert_finetuned/                      # Checkpoint IndoBERT fine-tuned model & tokenizer
+│   ├── indobert_finetuned/                      # Checkpoint IndoBERT fine-tuned model & tokenizer
+│   ├── indobertweet_finetuned/                  # Checkpoint IndoBERTweet fine-tuned model & tokenizer
+│   └── README.md                                # Dokumentasi model, weights & checkpoint
 │
 ├── notebooks/                                   # 5 Interaktif Jupyter Notebooks (Tersinkronisasi)
 │   ├── 01_data_collection.ipynb
@@ -146,10 +154,12 @@ cobapenelitianpart4/
 │   ├── run_preprocessing.py
 │   ├── train_baseline_rf_xgb.py
 │   ├── train_indobert.py
+│   ├── train_indobertweet.py
 │   └── run_comparative_analysis.py
 │
 ├── brief_jurnal_scopus.md                       # Brief manuskrip lengkap untuk Academic Writer
 ├── IMPLEMENTATION_PLAN.md                       # Pelacakan implementasi & justifikasi akademik
+├── README_reproducibility.md                    # Panduan teknis eksekusi riset ulang
 └── README.md                                    # Dokumentasi repositori utama
 ```
 
@@ -162,8 +172,8 @@ cobapenelitianpart4/
 2. **Soroti Keunggulan Delta:**
    Tekankan bahwa IndoBERT mengungguli XGBoost sebesar **+8,71% Macro-F1** dan mengungguli Random Forest sebesar **+13,49%**. Ini membuktikan secara kuat hipotesis utama bahwa *contextual attention* diperlukan untuk menangani sintaksis bahasa informal Indonesia.
 3. **Soroti Solusi Neutral Collapse:**
-   Model *tree-based* hanya mencapai F1 Netral 7,31% (RF) dan 18,39% (XGBoost), sedangkan IndoBERT mampu mencapai **40,73%**. Ini adalah kontribusi teknis bernilai tinggi yang disukai reviewer jurnal.
+   Model *tree-based* hanya mencapai F1 Netral 7,31% (RF) dan 18,39% (XGBoost), sedangkan IndoBERT mampu mencapai **40,73%** (dan IndoBERTweet mencapai **42,23%**). Ini adalah kontribusi teknis bernilai tinggi yang disukai reviewer jurnal.
 4. **Validitas Metodologis:**
-   Cantumkan skor **Cohen's Kappa $\kappa = 0,8939$** pada metodologi sebagai bukti bahwa anotasi data memenuhi standar reliabilitas tertinggi (*almost perfect agreement*).
+   Cantumkan skor **Cohen's Kappa $\kappa = 0,8662$** (*Human Inter-Annotator Agreement* pada 300 sampel independen) pada metodologi sebagai bukti bahwa anotasi data memenuhi standar reliabilitas tinggi (*substantial agreement*), serta laporkan skor audit konsistensi leksikal internal (89,39%).
 5. **Gunakan Studi Ablasi (Table 4):**
    Gunakan Table 4 sebagai bukti kontribusi modular: setiap tahapan (slang, disambiguasi, penambahan konteks, dan bobot *loss*) memberikan peningkatan terukur pada model.

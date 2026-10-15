@@ -1,7 +1,7 @@
 <!--
 Author: Muhammad Farrel Haidar
 Project: AI PR & KOL Specialist DSS
-Date: 2026-10-14
+Date: 2026-10-15
 -->
 
 # Research Brief: Comparative Sentiment Analysis on Indonesian E-Commerce Reviews
@@ -12,7 +12,9 @@ Date: 2026-10-14
 - **Target Indeksasi:** Scopus Q2 / Q3 (e.g., *Bulletin of Electrical Engineering and Informatics*, *Jurnal Ilmiah Teknik Elektro Komputer dan Informatika (JITEKI)*, *IAES International Journal of Artificial Intelligence*)
 - **Domain:** Ulasan Aplikasi E-Commerce Indonesia (Tokopedia, Shopee, Lazada, Bukalapak) di Google Play Store
 - **Volume Data:** 16.000 ulasan mentah $\rightarrow$ **12.777 ulasan bersih** (Retensi 79,86%)
-- **Validasi Ground-Truth:** Cohen's Kappa $\kappa = 0,8939$ (*Almost Perfect Agreement*, 500 sampel terstratifikasi)
+- **Validasi Ground-Truth & Reliabilitas Anotasi:**
+  - **Human Inter-Annotator Agreement (IAA):** Cohen's Kappa $\kappa = 0,8662$ (*Substantial/Almost Perfect Agreement*, 300 sampel terstratifikasi independen oleh 2 penilai domain).
+  - **Internal Heuristic Consistency Audit:** Kesesuaian aturan leksikal-rating 89,39% ($N = 500$).
 - **Model yang Dibandingkan:**
   1. Baseline 1: Random Forest (300 Trees) + TF-IDF (1-2 gram, 10.000 fitur)
   2. Baseline 2: XGBoost (500 Estimators, Multi:softprob, Early Stopping) + TF-IDF (1-2 gram, 10.000 fitur)
@@ -26,7 +28,7 @@ Date: 2026-10-14
 - **Konteks & Urgensi:** Pertumbuhan pesat e-commerce di Indonesia (penetrasi pasar Tokopedia, Shopee, Lazada, Bukalapak) menghasilkan volume ulasan publik yang masif. Dalam perspektif Public Relations (PR) dan *Key Opinion Leader* (KOL) specialist, pemahaman sentimen publik secara real-time adalah fondasi *Crisis Management* dan *Brand Reputation Strategy*.
 - **Research Gap:** Model berbasis leksikon/TF-IDF tradisional rentan terhadap kegagalan inferensi (*false polarity*) pada bahasa Indonesia informal yang sarat singkatan (*slang*), negasi bertingkat (*"tidak buruk"*), konjungsi kontrastif (*"bagus tapi lambat"*), dan sarkasme. Selain itu, ulasan rating 3 sering memicu fenomena *Neutral Collapse* jika tidak ditangani dengan leksikon disambiguasi dan *loss weighting*.
 - **Kontribusi Penelitian:**
-  1. Konstruksi korpus ulasan e-commerce Indonesia berskala 12.777 ulasan bersih dengan anotasi 3-kelas (*Negatif, Netral, Positif*) dan uji reliabilitas Cohen's Kappa ($\kappa = 0,8939$).
+  1. Konstruksi korpus ulasan e-commerce Indonesia berskala 12.777 ulasan bersih dengan anotasi 3-kelas (*Negatif, Netral, Positif*) dan uji reliabilitas ganda Cohen's Kappa ($\kappa = 0,8662$).
   2. Studi komparatif empiris antara representasi *Bag-of-Words* (TF-IDF + Random Forest / XGBoost) versus *Deep Contextual Attention* (IndoBERT dengan Class-Weighted Cross-Entropy Loss).
   3. Mengatasi masalah kegagalan prediksi kelas netral (*Neutral Collapse*) melalui intervensi *hybrid rating-lexicon disambiguation* dan *class weighting*.
   4. Studi ablasi modular 4-tahap (Table 4) yang mengkuantifikasi kontribusi normalisasi slang (+1,48%), kapasitas konteks penuh 256 token (+2,53%), dan *class-weighted loss* (+3,79% F1-Macro).
@@ -36,7 +38,7 @@ Date: 2026-10-14
 
 ### II. RELATED WORK & THEORETICAL FOUNDATION
 *(Gunakan 20–30 sitasi standar APA terlampir di Section 3).*
-- Pembahasan model Transformer untuk bahasa Indonesia (Koto et al., 2020; Wilie et al., 2020).
+- Pembahasan model Transformer untuk bahasa Indonesia (Koto et al., 2020; Wilie et al., 2020; Koto et al., 2021).
 - Studi komparasi NLP e-commerce terkini (Yulianti & Nissa, 2024; Zahra, 2025; Imran et al., 2025; Simarmata & Sasongko, 2025).
 - Landasan algoritma *Ensemble Tree* (Breiman, 2001; Chen & Guestrin, 2016).
 
@@ -54,7 +56,7 @@ Date: 2026-10-14
        │ Slang Normalization: 150+ words dictionary (gak→tidak, bgt→banget, ongkir→ongkos kirim)
        │ Hybrid Disambiguation on Rating 3: Leksikal filter untuk polaritas ganda
        │ Labeling: Score 1-2 (Negatif), Score 3 (Netral murni), Score 4-5 (Positif)
-       │ Ground-Truth Validation: 500 samples Cohen's Kappa (kappa = 0.8939)
+       │ Ground-Truth Validation: 300 samples Human IAA (kappa = 0.8662) & Heuristic Audit (89.39%)
        ▼
 [Stratified Splitting: 80% Train (10,221), 10% Val (1,278), 10% Test (1,278)]
        │
@@ -88,9 +90,11 @@ Date: 2026-10-14
 | **Random Forest + SMOTE** | TF-IDF + Synthetic Oversampling | 61,97% | 53,40% | 24,49% | 0,7383 | 7,73 s |
 | **XGBoost** | TF-IDF (1-2 gram, 10k) + Early Stop | 64,08% | 53,05% | 18,39% ⚠️ | 0,7540 | 52,90 s |
 | **XGBoost + SMOTE** | TF-IDF + Synthetic Oversampling | 60,80% | 53,96% | 26,58% | 0,7523 | 55,84 s |
-| **IndoBERT** (`indobert-base-p1`) | Deep Contextual (max_len=256, Weighted CE) | **65,26%** | **61,76%** | **40,73%** 🎯 | **0,8055** | 607,32 s |
+| **IndoBERT (base-p1)** | Deep Contextual (max_len=256, Weighted CE) | **65,26%** 🏆 | **61,76%** 🏆 | **40,73%** 🎯 | **0,8055** 🏆 | 607,32 s |
+| **IndoBERTweet (uncased)** | Deep Contextual (max_len=256, Weighted CE) | 63,46% | 61,23% | **42,23%** 🚀 | 0,8016 | 436,06 s |
 
 - **Keunggulan Defensibel IndoBERT (Penyelesaian Neutral Collapse):** Keunggulan utama IndoBERT (+8,71pp Macro-F1 dari XGBoost) bersumber secara krusial dari pemecahan masalah kelas Netral (**+22,34pp vs XGBoost standar, +14,15pp vs XGBoost+SMOTE**).
+- **Varian Domain Sosial (IndoBERTweet):** IndoBERTweet yang dilatih khusus pada korpus media sosial informal Indonesia mencapai **F1 Netral tertinggi (42,23%)**, membuktikan adaptabilitas leksikal gaul yang sangat kuat, sementara IndoBERT-base tetap menjadi model utama terbaik secara global (Akurasi 65,26%) karena superioritasnya menangani komplain transaksional yang berstruktur panjang.
 - **Kegagalan SMOTE Mengatasi Ambiguitas Kontekstual:** Meskipun SMOTE menaikkan F1 Netral tree-based models dari 7-18% ke 24-26%, ia menyebabkan akurasi XGBoost anjlok sebesar 3,28pp (dari 64,08% menjadi 60,80%). Hal ini membuktikan bahwa oversampling sintetis pada representasi sparse unigram/bigram menciptakan noise batas keputusan, menegaskan superioritas representasi atensi kontekstual IndoBERT.
 - **Separasi Probabilitas (ROC-AUC):** IndoBERT melampaui ambang batas **0,8055**, jauh di atas XGBoost (0,7540) dan Random Forest (0,7430), memvalidasi kemampuan kalibrasi probabilitas kelas transformer.
 
@@ -142,8 +146,9 @@ Date: 2026-10-14
 4. Dhendra, & Utomo, V. G. (2025). Benchmarking IndoBERT and Transformer Models for Sentiment Classification on Indonesian E-Government Service Reviews. *Transformatika*, 23(1).
 5. Imran, A. Y., Sanjaya, M. R., Putra, B. W., & Cahyadi, G. E. H. (2025). Optimization of Sentiment Analysis on Tokopedia User Reviews Using GridSearchCV and SMOTE with Machine Learning Algorithms. *Jurnal Inovtek Polbeng*, 10(3).
 6. Koto, F., Rahimi, A., Lau, J. H., & Baldwin, T. (2020). IndoLEM and IndoBERT: A Benchmark Dataset and Pre-trained Language Model for Indonesian NLP. In *Proceedings of the 28th International Conference on Computational Linguistics (COLING 2020)* (pp. 757-770).
-7. Sayarizki, P., Hasmawati, & Nurrahmi, H. (2024). Implementation of IndoBERT for Sentiment Analysis of Indonesian Presidential Candidates. *Indonesian Journal on Computing (Indo-JC)*, 9(2), 61-72.
-8. Simarmata, A. A. P., & Sasongko, T. B. (2025). Sentiment Analysis on BRImo Application Reviews Using IndoBERT. *Journal of Applied Informatics and Computing (JAIC)*, 9(3), 851-862.
-9. Wilie, B., Vincentio, K., Winata, G. I., Cahyawijaya, S., Li, X., Lim, Z. Y., ... & Purwarianti, A. (2020). IndoNLU: Benchmark and Resources for Evaluating Indonesian Natural Language Understanding. In *Proceedings of AACL-IJCNLP 2020* (pp. 843-860).
-10. Yulianti, E., & Nissa, N. K. (2024). ABSA of Indonesian customer reviews using IndoBERT: single-sentence and sentence-pair classification approaches. *Bulletin of Electrical Engineering and Informatics*, 13(5), 3579-3589.
-11. Zahra, N. Z. (2025). Benchmarking Logistic Regression, SVM, Naive Bayes, and IndoBERT Fine-Tuning for Sentiment Analysis on Indonesian Product Reviews. *arXiv preprint arXiv:2605.03439*.
+7. Koto, F., Rahimi, A., Lau, J. H., & Baldwin, T. (2021). IndoBERTweet: A Pre-trained Language Model for Indonesian Twitter with Effective Domain-Specific Vocabulary Initialization. In *Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing (EMNLP 2021)* (pp. 10660-10668).
+8. Sayarizki, P., Hasmawati, & Nurrahmi, H. (2024). Implementation of IndoBERT for Sentiment Analysis of Indonesian Presidential Candidates. *Indonesian Journal on Computing (Indo-JC)*, 9(2), 61-72.
+9. Simarmata, A. A. P., & Sasongko, T. B. (2025). Sentiment Analysis on BRImo Application Reviews Using IndoBERT. *Journal of Applied Informatics and Computing (JAIC)*, 9(3), 851-862.
+10. Wilie, B., Vincentio, K., Winata, G. I., Cahyawijaya, S., Li, X., Lim, Z. Y., ... & Purwarianti, A. (2020). IndoNLU: Benchmark and Resources for Evaluating Indonesian Natural Language Understanding. In *Proceedings of AACL-IJCNLP 2020* (pp. 843-860).
+11. Yulianti, E., & Nissa, N. K. (2024). ABSA of Indonesian customer reviews using IndoBERT: single-sentence and sentence-pair classification approaches. *Bulletin of Electrical Engineering and Informatics*, 13(5), 3579-3589.
+12. Zahra, N. Z. (2025). Benchmarking Logistic Regression, SVM, Naive Bayes, and IndoBERT Fine-Tuning for Sentiment Analysis on Indonesian Product Reviews. *arXiv preprint arXiv:2605.03439*.
