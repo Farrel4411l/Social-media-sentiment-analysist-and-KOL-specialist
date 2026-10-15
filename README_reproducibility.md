@@ -67,7 +67,7 @@ python scripts/train_baseline_rf_xgb.py
 ```
 *Untuk menguji baseline dengan oversampling sintetis (SMOTE):*
 ```bash
-py -3.10 scratch/test_smote.py
+python scripts/train_baseline_smote.py
 ```
 *Hasil:*
 - `models/rf_tfidf.pkl`, `models/xgb_tfidf.pkl`, `models/tfidf_vectorizer.pkl`.

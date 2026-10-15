@@ -42,7 +42,7 @@ Demi mematuhi aturan batas ukuran berkas Git (100 MB), file bobot biner besar di
    ```
 2. **Melatih Ulang Baseline dengan SMOTE Oversampling:**
    ```bash
-   py -3.10 scratch/test_smote.py
+   python scripts/train_baseline_smote.py
    ```
 3. **Melatih Ulang Model Utama IndoBERT (GPU Accelerated):**
    ```bash
