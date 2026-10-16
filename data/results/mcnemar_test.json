@@ -20,5 +20,5 @@
     "P_Value_Neutral": "< 0.0001",
     "Statistically_Significant (p < 0.001)": true
   },
-  "Interpretation": "Uji McNemar (Dietterich, 1998) pada akurasi agregat keseluruhan menghasilkan Chi2 = 0.6735 (p = 0.4118 > 0.05) karena tertutupi oleh dominasi kelas mayoritas (Negatif & Positif). Namun, pada pengujian McNemar khusus kelas minoritas Netral (N=268), keunggulan IndoBERT sangat signifikan secara statistik (Chi2 = 71.68, p < 0.0001), yang mendorong lonjakan Macro-F1 sebesar +8.71pp dan pemulihan F1 Netral sebesar +22.34pp serta mengoreksi total 153 kesalahan semantik XGBoost."
+  "Interpretation": "Uji McNemar (Dietterich, 1998) pada akurasi agregat keseluruhan mencatat 153 koreksi benar oleh IndoBERT berbanding 138 koreksi oleh XGBoost (net +15 sampel pada akurasi agregat, Chi2 = 0.6735, p = 0.4118 > 0.05) yang tidak signifikan secara statistik pada akurasi total karena tertutupi oleh dominasi kelas mayoritas (Negatif & Positif). Namun, pada pengujian McNemar khusus kelas minoritas Netral (N=268), keunggulan IndoBERT sangat signifikan secara statistik (123 benar vs 32 benar; Chi2 = 71.68, p < 0.0001), yang membuktikan bahwa keunggulan model terkonsentrasi pada resolusi ambiguitas semantik kelas Netral (+22.34pp) dan lonjakan Macro-F1 (+8.71pp)."
 }

@@ -1,7 +1,7 @@
 <!--
 Author: Muhammad Farrel Haidar
 Project: AI PR & KOL Specialist DSS
-Date: 2026-10-15
+Date: 2026-10-17
 -->
 
 # MASTER IMPLEMENTATION PLAN (OPSI B: JALUR KOMPREHENSIF)
@@ -75,7 +75,7 @@ Dokumen ini memuat rencana kerja terstruktur, perbaikan metodologis, arsitektur 
   - [x] Pelatihan ulang Random Forest standar (Acc: 62,60%, F1-Macro: 48,27%, F1-Netral: 7,31%)
   - [x] Pelatihan ulang XGBoost standar (Acc: 64,08%, F1-Macro: 53,05%, F1-Netral: 18,39%)
   - [x] Uji komparasi adil dengan oversampling sintetis (RF+SMOTE F1-Netral 24,49%; XGB+SMOTE F1-Netral 26,58%, Acc turun ke 60,80%)
-  - [x] Simpan `paper_assets/table2_model_comparison_extended.csv` membuktikan keunggulan mutlak IndoBERT (F1-Netral 40,73%) bahkan terhadap model pohon yang dioversample.
+  - [x] Simpan `paper_assets/table2_model_comparison.csv` membuktikan keunggulan mutlak IndoBERT (F1-Netral 40,73%) bahkan terhadap model pohon yang dioversample.
   - [x] Update `data/results/metrics_rf.csv`, `metrics_xgb.csv`, dan Confusion Matrix PNG
 
 - [x] **Tahap B3: Re-Training IndoBERT (Weighted Loss + Length 256 + RTX 4070)**
@@ -91,7 +91,7 @@ Dokumen ini memuat rencana kerja terstruktur, perbaikan metodologis, arsitektur 
   - [x] Update Figure 5 (`figure5_f1_comparison_barplot.png`) dan Figure 2 (`figure2_wordcloud_per_class.png`)
   - [x] Update Figure 4 (`figure4_confusion_matrix_comparison.png`)
   - [x] Jalankan Ablation Study (Table 4: Pengaruh Slang, Disambiguation, Length 256, dan Weighted Loss)
-  - [x] Hitung ulang McNemar’s Test statistik ($\chi^2 = 0,6735, p = 0,4118$; IndoBERT mengoreksi 153 kesalahan XGBoost)
+  - [x] Hitung ulang McNemar’s Test statistik (153 vs 138 koreksi, net +15, $\chi^2 = 0,6735, p = 0,4118$; serta $\chi^2 = 71,68, p < 0,0001$ pada kelas Netral)
   - [x] Ekstraksi 20 sampel kualitatif linguistik baru ke `error_analysis_samples.csv`
 
 - [x] **Tahap B5: Final Handoff Package & Documentation Sync**
@@ -111,9 +111,7 @@ cobapenelitianpart4/
 │
 ├── paper_assets/                                # Aset Gambar & Tabel Ilmiah (300 DPI)
 │   ├── table1_dataset_statistics.csv            # Tabel 1: Distribusi korpus ulasan e-commerce
-│   ├── table2_model_comparison.csv              # Tabel 2: Komparasi metrik RF vs XGB vs IndoBERT
-│   ├── table2_model_comparison_extended.csv     # Tabel 2 Extended: Evaluasi SMOTE pada RF & XGB
-│   ├── table2_model_comparison_with_indobertweet.csv # Tabel 2 Lengkap: Benchmark 6 Model
+│   ├── table2_model_comparison.csv              # Tabel 2: Canonical benchmark 6 model (RF, XGB, IndoBERT, SMOTE, IndoBERTweet)
 │   ├── table3_per_class_metrics.csv             # Tabel 3: Metrik per kelas (Negatif, Netral, Positif)
 │   ├── table4_ablation_study.csv                # Tabel 4: Studi ablasi 4 konfigurasi
 │   ├── figure1_data_distribution.png            # Gambar 1: Distribusi rating dan sentimen per aplikasi
@@ -126,7 +124,7 @@ cobapenelitianpart4/
 │   ├── figure5_f1_comparison_barplot.png        # Gambar 5: Barplot komparasi F1-Score per kelas
 │   ├── cohen_kappa_inter_annotator_agreement.json # Validasi independen 2 penilai (kappa = 0.8662)
 │   ├── label_consistency_audit.json             # Audit konsistensi aturan leksikal-rating (89.39%)
-│   ├── mcnemar_test.json                        # Hasil uji signifikansi statistik McNemar (chi2 = 0.6735)
+│   ├── mcnemar_test.json                        # Hasil uji signifikansi statistik McNemar (chi2 = 0.6735, p = 0.4118 & chi2 = 71.68, p < 0.0001)
 │   └── error_analysis_samples.csv               # 20 kasus linguistik mendalam (sarkasme, negasi ganda)
 │
 ├── data/
@@ -153,10 +151,12 @@ cobapenelitianpart4/
 ├── scripts/                                     # Headless Runner Scripts
 │   ├── run_preprocessing.py
 │   ├── train_baseline_rf_xgb.py
+│   ├── train_baseline_smote.py
 │   ├── train_indobert.py
 │   ├── train_indobertweet.py
 │   └── run_comparative_analysis.py
 │
+├── MANUSCRIPT_DRAFT_EN.md                       # Manuskrip lengkap Bahasa Inggris (IMRaD Scopus Ready)
 ├── brief_jurnal_scopus.md                       # Brief manuskrip lengkap untuk Academic Writer
 ├── IMPLEMENTATION_PLAN.md                       # Pelacakan implementasi & justifikasi akademik
 ├── README_reproducibility.md                    # Panduan teknis eksekusi riset ulang

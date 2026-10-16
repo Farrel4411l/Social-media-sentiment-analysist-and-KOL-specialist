@@ -11,7 +11,7 @@ Output disimpan terpisah tanpa menimpa dokumentasi IndoBERT-base:
 - Model Checkpoint: models/indobertweet_finetuned/
 - Metrik CSV: data/results/metrics_indobertweet.csv
 - Visualisasi: paper_assets/figure3_training_curves_indobertweet.png & figure4_confusion_matrix_indobertweet.png
-- Tabel Komparasi Terpadu: paper_assets/table2_model_comparison_with_indobertweet.csv
+- Tabel Komparasi Terpadu: paper_assets/table2_model_comparison.csv
 """
 
 import os
@@ -358,25 +358,25 @@ def main():
     plot_training_curves(loss_callback)
     plot_confusion_matrix(y_test, y_pred)
 
-    # 12. Simpan Tabel Komparasi Terpadu (Preserving All Previous Documentation)
-    # Baca model yang ada
-    base_t2 = pd.read_csv("paper_assets/table2_model_comparison_extended.csv")
-    new_row = pd.DataFrame([{
-        "Model": "IndoBERTweet (Pretrained on Informal Social)",
-        "Balancing_Strategy": "Class-Weighted Cross-Entropy Loss",
-        "Accuracy": f"{acc * 100:.2f}%",
-        "Precision (macro)": f"{p_macro * 100:.2f}%",
-        "Recall (macro)": f"{r_macro * 100:.2f}%",
-        "F1 (macro)": f"{f1_macro * 100:.2f}%",
-        "F1 (weighted)": f"{f1_weighted * 100:.2f}%",
-        "F1 (Neutral)": f"{f_per[1] * 100:.2f}%",
-        "ROC-AUC (OVR)": f"{roc_auc:.4f}",
-        "Training Time (s)": f"{training_time:.2f}"
-    }])
-    combined_t2 = pd.concat([base_t2, new_row], ignore_index=True)
-    combined_t2.to_csv("paper_assets/table2_model_comparison_with_indobertweet.csv", index=False)
-    combined_t2.to_csv("data/results/table2_model_comparison_with_indobertweet.csv", index=False)
-    logger.info("Tabel Komparasi Terpadu Tersimpan di: paper_assets/table2_model_comparison_with_indobertweet.csv")
+    # 12. Simpan Tabel Komparasi Terpadu (Canonical Table 2)
+    base_t2 = pd.read_csv("paper_assets/table2_model_comparison.csv")
+    if not (base_t2["Model"] == "IndoBERTweet (Fine-Tuned)").any():
+        new_row = pd.DataFrame([{
+            "Model": "IndoBERTweet (Fine-Tuned)",
+            "Balancing_Strategy": "Class-Weighted Cross-Entropy Loss",
+            "Accuracy": f"{acc * 100:.2f}%",
+            "Precision (macro)": f"{p_macro * 100:.2f}%",
+            "Recall (macro)": f"{r_macro * 100:.2f}%",
+            "F1 (macro)": f"{f1_macro * 100:.2f}%",
+            "F1 (weighted)": f"{f1_weighted * 100:.2f}%",
+            "F1 (Neutral)": f"{f_per[1] * 100:.2f}%",
+            "ROC-AUC (OVR)": f"{roc_auc:.4f}",
+            "Training Time (s)": f"{training_time:.2f}"
+        }])
+        combined_t2 = pd.concat([base_t2, new_row], ignore_index=True)
+        combined_t2.to_csv("paper_assets/table2_model_comparison.csv", index=False)
+        combined_t2.to_csv("data/results/table2_model_comparison.csv", index=False)
+    logger.info("Tabel Komparasi Terpadu Tersimpan di: paper_assets/table2_model_comparison.csv")
 
 
 if __name__ == "__main__":

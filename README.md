@@ -70,9 +70,10 @@ Riset ini mengevaluasi keandalan model *Contextual Transformer* versus *Tree-Bas
   - **Human Inter-Annotator Agreement (IAA)**: 300 sampel acak terstratifikasi diuji independen oleh 2 penilai domain menghasilkan skor **Cohen’s Kappa $\kappa = 0.8662$** (`paper_assets/cohen_kappa_inter_annotator_agreement.json`).
   - **Internal Heuristic Consistency Audit**: Verifikasi konsistensi leksikal aturan rating 3 menghasilkan skor kecocokan **89.39%** (`paper_assets/label_consistency_audit.json`).
 - **Ablation Study (Table 4, `paper_assets/table4_ablation_study.csv`)**: Mengonfirmasi kontribusi bertahap dari Base IndoBERT (Macro-F1 57.97%, F1-Netral 32.40%) $\rightarrow$ +Slang & Disambiguation (Macro-F1 59.45% [+1.48%], F1-Netral 34.18%) $\rightarrow$ +Extended Context Length 256 (Macro-F1 60.50% [+2.53%], F1-Netral 35.80%) $\rightarrow$ Proposed Full IndoBERT dengan Class-Weighted CE Loss (**Akurasi 65.26%, Macro-F1 61.76% [+3.79%], F1-Netral 40.73%**).
-- **Uji Signifikansi Statistik McNemar (`paper_assets/mcnemar_test.json`)**: Mengacu pada prosedur Dietterich (1998), uji McNemar pada akurasi keseluruhan menghasilkan $\chi^2 = 0.6735$ ($p = 0.4118 > 0.05$) karena metrik akurasi total tertutupi (*masked*) oleh dominasi kelas mayoritas (Positif & Negatif). Namun, pada **uji McNemar khusus kelas minoritas Netral ($N=268$)**, keunggulan IndoBERT terbukti sangat signifikan secara statistik (**$\chi^2 = 71.68, p < 0.0001$**), yang secara langsung mendorong lonjakan **+8.71pp Macro-F1**, **pemulihan kelas Netral (+22.34pp)**, serta koreksi atas **153 kesalahan semantik XGBoost**.
+- **Uji Signifikansi Statistik McNemar (`paper_assets/mcnemar_test.json`)**: Mengacu pada prosedur Dietterich (1998), uji McNemar pada akurasi agregat keseluruhan mencatat 153 koreksi benar oleh IndoBERT berbanding 138 koreksi oleh XGBoost (keunggulan bersih *net* **+15 sampel**, $\chi^2 = 0.6735, p = 0.4118 > 0.05$) di mana akurasi total tertutupi (*masked*) oleh dominasi kelas mayoritas. Namun, pada **uji McNemar khusus subset kelas minoritas Netral ($N=268$)**, keunggulan IndoBERT terbukti sangat signifikan secara statistik (**123 benar vs 32 benar; $\chi^2 = 71.68, p < 0.0001$**), yang membuktikan bahwa keunggulan transformer terkonsentrasi pada pemecahan *Neutral Collapse* (**+22.34pp F1 Netral**) dan lonjakan **+8.71pp Macro-F1**.
 
 > 📄 **Dokumentasi Lengkap Riset & Naskah Manuskrip:**
+> - [Full English Manuscript Draft (IMRaD Scopus Ready)](MANUSCRIPT_DRAFT_EN.md)
 > - [Master Implementation Plan (Opsi B)](IMPLEMENTATION_PLAN.md)
 > - [Brief Jurnal Scopus & Template Manuskrip](brief_jurnal_scopus.md)
 > - [Panduan Reproduksibilitas](README_reproducibility.md)
@@ -127,6 +128,7 @@ cobapenelitianpart4/
 ├── scripts/                         # Pipeline Eksekusi Python (Headless)
 │   ├── run_preprocessing.py
 │   ├── train_baseline_rf_xgb.py
+│   ├── train_baseline_smote.py
 │   ├── train_indobert.py
 │   ├── train_indobertweet.py
 │   └── run_comparative_analysis.py
@@ -141,8 +143,7 @@ cobapenelitianpart4/
 │   ├── figure4_confusion_matrix_indobertweet.png
 │   ├── figure5_f1_comparison_barplot.png
 │   ├── table1_dataset_statistics.csv
-│   ├── table2_model_comparison.csv
-│   ├── table2_model_comparison_extended.csv
+│   ├── table2_model_comparison.csv # Canonical 6-model benchmark table
 │   ├── table3_per_class_metrics.csv
 │   ├── table4_ablation_study.csv
 │   ├── cohen_kappa_inter_annotator_agreement.json

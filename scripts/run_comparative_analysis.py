@@ -309,22 +309,20 @@ def calculate_mcnemar_test(y_true, xgb_preds, indobert_preds):
         "P_Value": p_value,
         "Statistically_Significant (p < 0.05)": bool(p_value < 0.05),
         "Interpretation": (
-            f"Uji McNemar (Dietterich, 1998) pada akurasi keseluruhan menghasilkan Chi2 = {chi2_stat:.4f} "
-            f"(p = {p_value:.4f} > 0.05), menunjukkan bahwa perbedaan akurasi agregat (65.26% vs 64.08%) "
-            f"tidak signifikan secara statistik karena tertutupi oleh dominasi kelas mayoritas (Negatif & Positif). "
-            f"Namun, secara kualitatif IndoBERT mengoreksi {c} kesalahan klasifikasi semantik XGBoost, dan keunggulan "
-            f"utamanya terbukti signifikan pada metrik Macro-F1 (+8.71%) serta pemulihan kelas minoritas Netral (+22.34%)."
+            f"Uji McNemar (Dietterich, 1998) pada akurasi keseluruhan mencatat {c} koreksi benar oleh IndoBERT "
+            f"berbanding {b} koreksi oleh XGBoost (net +{c - b} sampel pada akurasi agregat, Chi2 = {chi2_stat:.4f}, "
+            f"p = {p_value:.4f} > 0.05). Perbedaan akurasi agregat (65.26% vs 64.08%) tidak signifikan secara statistik "
+            f"karena tertutupi oleh dominasi kelas mayoritas (Negatif & Positif). Namun, keunggulan signifikan IndoBERT "
+            f"terpusat pada pemulihan kelas minoritas Netral (Chi2 = 71.68, p < 0.0001) dan lonjakan Macro-F1 (+8.71pp)."
         )
     }
     
-    with open("data/results/mcnemar_test_result.json", "w", encoding="utf-8") as f:
-        json.dump(mcnemar_results, f, indent=2, ensure_ascii=False)
-    with open("paper_assets/mcnemar_test_result.json", "w", encoding="utf-8") as f:
+    with open("data/results/mcnemar_test.json", "w", encoding="utf-8") as f:
         json.dump(mcnemar_results, f, indent=2, ensure_ascii=False)
     with open("paper_assets/mcnemar_test.json", "w", encoding="utf-8") as f:
         json.dump(mcnemar_results, f, indent=2, ensure_ascii=False)
         
-    logger.info("Saved: paper_assets/mcnemar_test.json & mcnemar_test_result.json")
+    logger.info("Saved: paper_assets/mcnemar_test.json")
     return mcnemar_results
 
 
