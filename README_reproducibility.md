@@ -127,3 +127,12 @@ Setiap langkah di atas memiliki padanan notebook interaktif yang telah disinkron
 3. `notebooks/03_baseline_rf_xgb.ipynb` — Vektorisasi TF-IDF, pelatihan Random Forest dan XGBoost.
 4. `notebooks/04_indobert_finetune.ipynb` — Fine-tuning IndoBERT dengan Weighted Loss dan Early Stopping.
 5. `notebooks/05_comparative_analysis.ipynb` — Visualisasi komparatif, studi ablasi Table 4, McNemar test, dan error analysis.
+ 
+---
+
+## 👨‍💻 Peneliti & Kontak
+- **Peneliti Utama:** Muhammad Farrel Haidar
+- **Program Studi:** S1 Teknik Informatika (Angkatan 2024, Semester 5)
+- **Email:** [muhammadfarrelhaidar@gmail.com](mailto:muhammadfarrelhaidar@gmail.com)
+- **LinkedIn:** [Muhammad Farrel Haidar](https://www.linkedin.com/in/muhammad-farrel-haidar-69364238a)
+- **GitHub:** [Farrel4411l](https://github.com/Farrel4411l)

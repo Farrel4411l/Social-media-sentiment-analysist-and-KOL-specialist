@@ -198,8 +198,11 @@ java -cp out Main
 ---
 
 ## 👨‍💻 Kontributor & Peneliti
-- **Muhammad Farrel Haidar** — *Lead Researcher & Developer*
-- Universitas / Afiliasi Riset: Program Studi Teknik Informatika / Ilmu Komputer
+- **Nama:** Muhammad Farrel Haidar (*Lead Researcher & Developer*)
+- **Program Studi:** S1 Teknik Informatika (Angkatan 2024, Semester 5)
+- **Email:** [muhammadfarrelhaidar@gmail.com](mailto:muhammadfarrelhaidar@gmail.com)
+- **LinkedIn:** [Muhammad Farrel Haidar](https://www.linkedin.com/in/muhammad-farrel-haidar-69364238a)
+- **GitHub:** [Farrel4411l](https://github.com/Farrel4411l)
 
 ---
 

@@ -7,8 +7,10 @@ Date: 2026-10-17
 # Contextual Transformers vs. Tree-Based Machine Learning: A Comparative Empirical Study on Indonesian E-Commerce Customer Reviews for Strategic Public Relations Decision Support
 
 **Muhammad Farrel Haidar**  
-*Department of Information Systems / Computer Science*  
-*Corresponding Author Email: farrel.haidar@example.edu*
+*Department of Informatics (Teknik Informatika), Faculty of Computer Science*  
+*Undergraduate Student & Researcher (Class of 2024, 5th Semester)*  
+*Corresponding Author Email: muhammadfarrelhaidar@gmail.com*  
+*LinkedIn: https://www.linkedin.com/in/muhammad-farrel-haidar-69364238a*
 
 ---
 
@@ -428,7 +430,7 @@ Future research will explore:
 ## ACKNOWLEDGMENTS & REPRODUCIBILITY STATEMENT
 
 All code, curated dataset splits, normalization lexicons, evaluation checkpoints, and visualization assets required to replicate every empirical finding and table reported in this paper are deterministically archived and open-sourced under the MIT License at the institutional research repository:  
-`https://github.com/farrelhaidar/cobapenelitianpart4`
+`https://github.com/Farrel4411l/Social-media-sentiment-analysist-and-KOL-specialist`
 
 ---
 

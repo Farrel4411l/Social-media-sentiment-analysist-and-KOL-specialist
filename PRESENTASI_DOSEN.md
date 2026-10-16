@@ -9,6 +9,9 @@
 # 🎓 THE BENEFITS OF BREAKING PROGRAMS INTO METHODS
 ### *Mencegah Silent Bugs Melalui Isolasi Scope & Manajemen Memori JVM*
 **Oleh: Muhammad Farrel Haidar**  
+**Jurusan: S1 Teknik Informatika (Angkatan 2024, Semester 5)**  
+**Email: muhammadfarrelhaidar@gmail.com**  
+**LinkedIn: https://www.linkedin.com/in/muhammad-farrel-haidar-69364238a**  
 **Mata Kuliah: Object-Oriented Programming (Java)**
 
 ---

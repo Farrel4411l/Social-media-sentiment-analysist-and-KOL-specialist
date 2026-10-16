@@ -8,7 +8,11 @@ Date: 2026-10-16
 
 ## 1. Metadata Penelitian
 - **Judul Rekomendasi:** *Contextual Transformers vs. Tree-Based Machine Learning: A Comparative Empirical Study on Indonesian E-Commerce Customer Reviews for Strategic Public Relations Decision Support*
-- **Peneliti Utama / Korespondensi:** Muhammad Farrel Haidar et al.
+- **Peneliti Utama / Korespondensi:** Muhammad Farrel Haidar
+- **Program Studi & Afiliasi:** S1 Teknik Informatika (Angkatan 2024, Semester 5)
+- **Email Korespondensi:** muhammadfarrelhaidar@gmail.com
+- **LinkedIn:** [Muhammad Farrel Haidar](https://www.linkedin.com/in/muhammad-farrel-haidar-69364238a)
+- **Repositori Riset:** [GitHub Repository](https://github.com/Farrel4411l/Social-media-sentiment-analysist-and-KOL-specialist)
 - **Target Indeksasi:** Scopus Q2 / Q3 (e.g., *Bulletin of Electrical Engineering and Informatics*, *Jurnal Ilmiah Teknik Elektro Komputer dan Informatika (JITEKI)*, *IAES International Journal of Artificial Intelligence*)
 - **Domain:** Ulasan Aplikasi E-Commerce Indonesia (Tokopedia, Shopee, Lazada, Bukalapak) di Google Play Store
 - **Volume Data:** 16.000 ulasan mentah $\rightarrow$ **12.777 ulasan bersih** (Retensi 79,86%)

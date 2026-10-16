@@ -53,6 +53,11 @@ with st.sidebar:
     st.checkbox("NewsAPI", value=True, disabled=True)
     
     st.markdown("---")
+    st.subheader("👨‍💻 Lead Researcher")
+    st.markdown("**Muhammad Farrel Haidar**")
+    st.caption("Teknik Informatika (Angkatan 2024, Semester 5)")
+    st.markdown("📧 [muhammadfarrelhaidar@gmail.com](mailto:muhammadfarrelhaidar@gmail.com)")
+    st.markdown("🔗 [LinkedIn Profile](https://www.linkedin.com/in/muhammad-farrel-haidar-69364238a)")
     st.caption("Pastikan backend FastAPI Anda sedang berjalan.")
 
 st.markdown("### 🔍 Generate KOL Campaign Secara Otomatis")
@@ -160,4 +165,4 @@ if st.button("🚀 Scrape & Generate Campaign", type="primary", use_container_wi
                 st.error(f"⚠️ Terjadi kesalahan: {str(e)}")
 
 st.markdown("---")
-st.markdown("<div style='text-align: center; color: #666;'>© 2026 Muhammad Farrel Haidar - AI PR & KOL Specialist DSS</div>", unsafe_allow_html=True)
+st.markdown("<div style='text-align: center; color: #888;'>© 2026 <b>Muhammad Farrel Haidar</b> (Teknik Informatika '24, Semester 5) — AI PR & KOL Specialist DSS<br><a href='mailto:muhammadfarrelhaidar@gmail.com' style='color:#2e66ff;'>Email</a> | <a href='https://www.linkedin.com/in/muhammad-farrel-haidar-69364238a' target='_blank' style='color:#2e66ff;'>LinkedIn</a></div>", unsafe_allow_html=True)
