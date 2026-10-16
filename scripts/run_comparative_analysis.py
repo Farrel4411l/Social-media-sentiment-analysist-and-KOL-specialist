@@ -313,7 +313,7 @@ def calculate_mcnemar_test(y_true, xgb_preds, indobert_preds):
             f"berbanding {b} koreksi oleh XGBoost (net +{c - b} sampel pada akurasi agregat, Chi2 = {chi2_stat:.4f}, "
             f"p = {p_value:.4f} > 0.05). Perbedaan akurasi agregat (65.26% vs 64.08%) tidak signifikan secara statistik "
             f"karena tertutupi oleh dominasi kelas mayoritas (Negatif & Positif). Namun, keunggulan signifikan IndoBERT "
-            f"terpusat pada pemulihan kelas minoritas Netral (Chi2 = 71.68, p < 0.0001) dan lonjakan Macro-F1 (+8.71pp)."
+            f"terpusat pada pemulihan kelas minoritas Netral (Chi2 = 78.64, p < 0.0001) dan lonjakan Macro-F1 (+8.71pp)."
         )
     }
     

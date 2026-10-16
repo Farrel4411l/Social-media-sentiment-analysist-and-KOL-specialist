@@ -111,7 +111,7 @@ py -3.10 scripts/run_comparative_analysis.py
 - `paper_assets/table2_model_comparison.csv` (Perbandingan kanonikal lengkap 6 model: RF, RF+SMOTE, XGB, XGB+SMOTE, IndoBERT, IndoBERTweet).
 - `paper_assets/table3_per_class_metrics.csv` (Metrik per kelas: Negatif, Netral, Positif untuk seluruh model).
 - `paper_assets/table4_ablation_study.csv` (Studi ablasi kontribusi Slang, Context 256, & Weighted Loss).
-- `paper_assets/mcnemar_test.json` (Uji McNemar 2-level: net +15 koreksi agregat, $\chi^2 = 0,6735, p = 0,4118$; signifikansi kelas Netral $\chi^2 = 71,68, p < 0,0001$).
+- `paper_assets/mcnemar_test.json` (Uji McNemar 2-level: net +15 koreksi agregat, $\chi^2 = 0,6735, p = 0,4118$; signifikansi kelas Netral $\chi^2 = 78,64, p < 0,0001$).
 - `paper_assets/figure5_f1_comparison_barplot.png` (300 DPI).
 - `paper_assets/figure2_wordcloud_per_class.png` (300 DPI).
 - `paper_assets/figure4_confusion_matrix_comparison.png` (300 DPI side-by-side).

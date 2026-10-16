@@ -7,16 +7,14 @@ Date: 2026-10-17
 # Contextual Transformers vs. Tree-Based Machine Learning: A Comparative Empirical Study on Indonesian E-Commerce Customer Reviews for Strategic Public Relations Decision Support
 
 **Muhammad Farrel Haidar**  
-*Department of Informatics (Teknik Informatika), Faculty of Computer Science*  
-*Undergraduate Student & Researcher (Class of 2024, 5th Semester)*  
-*Corresponding Author Email: muhammadfarrelhaidar@gmail.com*  
-*LinkedIn: https://www.linkedin.com/in/muhammad-farrel-haidar-69364238a*
+*Department of Informatics, Faculty of Communication and Computer, Institut Bisnis dan Informatika Kwik Kian Gie, Jakarta, Indonesia*  
+*Corresponding Author Email: muhammadfarrelhaidar@gmail.com*
 
 ---
 
 ## Abstract
 
-In the contemporary digital economy, customer reviews on mobile application marketplaces serve as a primary indicator of consumer satisfaction, product usability, and corporate reputation. For Public Relations (PR) and Key Opinion Leader (KOL) specialists, automated sentiment analysis is essential for proactive brand health monitoring and rapid crisis escalation management. However, Indonesian e-commerce reviews present severe linguistic challenges, including widespread colloquialisms, informal abbreviations (*slang*), double negations (*litotes*), contrastive conjunctions, and extreme class imbalance—most notably manifested as the "Neutral Collapse" phenomenon, where non-polarized or constructive feedback is overwhelmingly absorbed by majority sentiment classes. This paper presents an end-to-end comparative empirical evaluation of traditional tree-based machine learning ensembles against deep contextual Transformer architectures on a multi-vendor Indonesian e-commerce corpus. We curated a balanced raw collection of 16,000 user reviews across four dominant platforms (Tokopedia, Shopee, Lazada, and Bukalapak) from the Google Play Store, resulting in 12,777 rigorously cleaned samples after deduplication, language filtering, domain-specific slang normalization (150+ words lexicon), and a hybrid rating-lexicon disambiguation protocol for 3-star reviews. Ground-truth annotation reliability was empirically validated through an independent dual-annotator study on 300 stratified samples, yielding substantial agreement with Cohen's Kappa $\kappa = 0.8662$, supported by an internal heuristic consistency audit of 89.39%. We systematically benchmarked Random Forest and XGBoost (under standard TF-IDF and Synthetic Minority Over-sampling Technique/SMOTE) against fine-tuned IndoBERT (`indobenchmark/indobert-base-p1`) and social-domain IndoBERTweet (`indolem/indobertweet-base-uncased`) trained with Class-Weighted Cross-Entropy Loss. Empirical results demonstrate that IndoBERT achieves superior overall performance with 65.26% accuracy, 61.76% Macro-F1, and an ROC-AUC of 0.8055. Crucially, while traditional models collapsed on the neutral class (Random Forest F1: 7.31%; XGBoost F1: 18.39%), IndoBERT successfully restored the neutral class to 40.73% F1 (+22.34 percentage points over XGBoost), and IndoBERTweet attained 42.23% neutral F1. Synthetic oversampling (SMOTE) failed to resolve contextual ambiguity, deteriorating XGBoost accuracy by 3.28 pp. A modular four-stage ablation study confirms the incremental necessity of slang normalization (+1.48 pp), extended 256-token context (+2.53 pp), and class-weighted loss (+3.79 pp). Rigorous McNemar statistical testing reveals that while aggregate accuracy differences reflect a net shift of +15 samples ($\chi^2 = 0.6735, p = 0.4118$) masked by majority class inertia, IndoBERT is statistically overwhelmingly superior on the minority neutral class ($\chi^2 = 71.68, p < 0.0001$). A qualitative linguistic error analysis on 20 curated real-world cases demonstrates IndoBERT's robust disambiguation of sarcasm, brand comparisons, and multi-clause feedback. Finally, an architectural blueprint integrating this pipeline into a Decision Support System (DSS) for PR brand protection and KOL campaign tracking is proposed.
+Automated sentiment analysis of mobile application reviews is essential for Public Relations (PR) crisis escalation and Key Opinion Leader (KOL) campaign monitoring. However, Indonesian e-commerce reviews exhibit pervasive colloquialisms (*slang*), double negations (*litotes*), contrastive conjunctions, and acute class imbalance—manifested as the "Neutral Collapse" phenomenon, where constructive or non-polarized feedback is absorbed into majority polarities. This study presents an empirical benchmark comparing tree-based machine learning ensembles against deep contextual Transformers on a multi-vendor Indonesian e-commerce corpus. From 16,000 raw Google Play Store reviews across Tokopedia, Shopee, Lazada, and Bukalapak, we curated 12,777 cleaned samples via deduplication, a 150+ word domain slang lexicon, and a hybrid rating-lexicon disambiguation protocol for 3-star reviews. Ground-truth reliability was verified via dual-annotator evaluation on 300 stratified samples ($\kappa = 0.8662$) and an 89.39% heuristic consistency audit. We benchmarked Random Forest and XGBoost (with TF-IDF and SMOTE) against fine-tuned IndoBERT (`indobenchmark/indobert-base-p1`) and IndoBERTweet trained with Class-Weighted Cross-Entropy Loss. IndoBERT achieved superior overall performance (65.26% accuracy, 61.76% Macro-F1, and 0.8055 ROC-AUC). Crucially, while Random Forest (7.31% F1) and XGBoost (18.39% F1) suffered severe neutral collapse, IndoBERT restored neutral F1 to 40.73% (+22.34 percentage points over XGBoost), and IndoBERTweet reached 42.23%. Conversely, SMOTE degraded XGBoost accuracy by 3.28 pp. A four-stage ablation study confirmed incremental gains from slang normalization (+1.48 pp), 256-token context (+2.53 pp), and class-weighted loss (+3.79 pp). While aggregate McNemar testing reflects majority-class masking ($\chi^2 = 0.6735, p = 0.4118$), IndoBERT's superiority on the neutral class is statistically overwhelming ($\chi^2 = 78.64, p < 0.0001$), providing a reliable engine for PR Decision Support Systems.
 
 **Keywords:** Sentiment Analysis, Natural Language Processing, IndoBERT, Class Imbalance, Neutral Collapse, E-Commerce Reviews, Decision Support System, Public Relations.
 
@@ -40,7 +38,7 @@ To resolve these fundamental challenges, this research delivers five primary con
 2. **Empirical Benchmarking of Tree-Based vs. Transformer Architectures:** We conduct a systematic comparison across six distinct configurations: Random Forest (standard and SMOTE-augmented), XGBoost (standard and SMOTE-augmented), IndoBERT-base-p1, and IndoBERTweet, evaluating macro-averaged, class-specific, and probabilistic discrimination metrics (ROC-AUC).
 3. **Resolution of the Neutral Collapse Phenomenon:** We demonstrate that while tree-based models and synthetic oversampling fail to solve neutral collapse (RF F1: 7.31%; XGB+SMOTE F1: 26.58% at a cost of 3.28 pp overall accuracy), fine-tuned IndoBERT equipped with Class-Weighted Cross-Entropy Loss elevates the neutral F1-score to **40.73%** (+22.34 pp over XGBoost), with IndoBERTweet reaching **42.23%**.
 4. **Modular Four-Stage Ablation Study:** We empirically disentangle the relative performance contributions of domain-specific slang normalization (+1.48 pp), extended 256-token context windows (+2.53 pp), and class-weighted optimization (+3.79 pp), validating recent preprocessing paradigms [5].
-5. **Rigorous Statistical and Qualitative Linguistic Deconstruction:** We perform a dual-level McNemar significance test [19], revealing that while aggregate accuracy gains reflect a balanced net shift of +15 samples ($\chi^2 = 0.6735, p = 0.4118$) due to majority-class masking, IndoBERT's neutral class superiority is statistically overwhelming ($\chi^2 = 71.68, p < 0.0001$). This is corroborated by a qualitative audit of 20 real-world failure cases categorizing litotes, promotional sarcasm, and contrastive syntax into an actionable Decision Support System (DSS) framework for PR intelligence.
+5. **Rigorous Statistical and Qualitative Linguistic Deconstruction:** We perform a dual-level McNemar significance test [19], revealing that while aggregate accuracy gains reflect a balanced net shift of +15 samples ($\chi^2 = 0.6735, p = 0.4118$) due to majority-class masking, IndoBERT's neutral class superiority is statistically overwhelming ($\chi^2 = 78.64, p < 0.0001$). This is corroborated by a qualitative audit of 20 real-world failure cases categorizing litotes, promotional sarcasm, and contrastive syntax into an actionable Decision Support System (DSS) framework for PR intelligence.
 
 The remainder of this article is structured as follows: Section II reviews related literature. Section III details the methodology, corpus curation, disambiguation, and modeling pipelines. Section IV presents experimental results, ablation studies, statistical tests, and qualitative error analysis. Section V evaluates threats to validity. Section VI discusses DSS architectural integration and managerial implications. Section VII concludes the paper.
 
@@ -175,7 +173,7 @@ To establish an uncompromised ground-truth, we applied a **hybrid rating-lexicon
 **Ground-Truth Validation Protocol:** Following the human validation paradigm advocated by Geni et al. [18], ground-truth reliability was subjected to formal empirical verification:
 1. **Independent Human Inter-Annotator Agreement (IAA):** A stratified random sample of 300 reviews ($N=300$) was independently evaluated by two domain experts without access to the automated labels. Inter-coder agreement was quantified using Cohen's Kappa ($\kappa$):
 $$\kappa = \frac{P_o - P_e}{1 - P_e}$$
-where $P_o$ is the relative observed agreement and $P_e$ is the hypothetical probability of chance agreement. The human annotation trial achieved **$\kappa = 0.8662$**, falling well into the range of *"Almost Perfect Agreement"* (Landis & Koch, 1977).
+where $P_o$ is the relative observed agreement and $P_e$ is the hypothetical probability of chance agreement. The human annotation trial achieved **$\kappa = 0.8662$**, falling well into the range of *"Almost Perfect Agreement"* [26].
 2. **Internal Heuristic Consistency Audit:** A 500-sample audit comparing automated disambiguation rules against strict domain criteria demonstrated an **89.39% consistency rate**.
 
 ### D. Dataset Partitioning
@@ -245,12 +243,12 @@ Table III presents the overarching empirical benchmark across all six investigat
 **TABLE III. Comprehensive Comparative Performance Benchmark on Test Corpus ($N = 1,278$)**
 | Model Architecture | Feature Representation / Strategy | Overall Accuracy (%) | Macro-F1 (%) | Weighted-F1 (%) | F1 (Neutral) (%) | ROC-AUC (OVR) | Training Latency (s) |
 |---|---|:---:|:---:|:---:|:---:|:---:|:---:|
-| **Random Forest** | TF-IDF (1-2 gram, 10k) + Balanced Weights | 62.60% | 48.27% | 58.74% | 7.31% 🚨 | 0.7430 | **7.51 s** |
+| **Random Forest** | TF-IDF (1-2 gram, 10k) + Balanced Weights | 62.60% | 48.27% | 58.74% | 7.31% | 0.7430 | **7.51 s** |
 | **Random Forest + SMOTE** | TF-IDF (1-2 gram, 10k) + Synthetic Oversampling | 61.97% | 53.40% | 60.85% | 24.49% | 0.7383 | 7.73 s |
-| **XGBoost** | TF-IDF (1-2 gram, 10k) + Early Stopping | 64.08% | 53.05% | 61.27% | 18.39% ⚠️ | 0.7540 | 52.90 s |
+| **XGBoost** | TF-IDF (1-2 gram, 10k) + Early Stopping | 64.08% | 53.05% | 61.27% | 18.39% | 0.7540 | 52.90 s |
 | **XGBoost + SMOTE** | TF-IDF (1-2 gram, 10k) + Synthetic Oversampling | 60.80% | 53.96% | 60.33% | 26.58% | 0.7523 | 55.84 s |
-| **IndoBERT (base-p1)** | Deep Contextual ($L=256$, Class-Weighted CE) | **65.26%** 🏆 | **61.76%** 🏆 | **65.17%** 🏆 | **40.73%** 🎯 | **0.8055** 🏆 | 607.32 s |
-| **IndoBERTweet (uncased)** | Deep Contextual ($L=256$, Class-Weighted CE) | 63.46% | 61.23% | 63.95% | **42.23%** 🚀 | 0.8016 | 436.06 s |
+| **IndoBERT (base-p1)** | Deep Contextual ($L=256$, Class-Weighted CE) | **65.26%** | **61.76%** | **65.17%** | **40.73%** | **0.8055** | 607.32 s |
+| **IndoBERTweet (uncased)** | Deep Contextual ($L=256$, Class-Weighted CE) | 63.46% | 61.23% | 63.95% | **42.23%** | 0.8016 | 436.06 s |
 
 Several profound findings are evident from Table III:
 1. **The Superiority of Contextual Deep Learning:** Fine-tuned IndoBERT establishes the highest overall performance across accuracy (65.26%), Macro-F1 (61.76%), and ROC-AUC (0.8055). Compared against standard XGBoost, IndoBERT delivers a **+8.71 percentage point surge in Macro-F1**, demonstrating that bidirectional self-attention captures subtle semantic patterns that entirely elude n-gram term frequencies.
@@ -265,16 +263,16 @@ To dissect the mechanics of the Neutral Collapse, Table IV presents the breakdow
 | Model Architecture | Target Class | Precision (%) | Recall (%) | F1-Score (%) | Class Status / Pathology |
 |---|---|:---:|:---:|:---:|---|
 | **Random Forest** | Negative ($n=532$) | 61.02% | **89.55%** | 72.58% | Heavily biased toward negative class |
-| | Neutral ($n=268$) | 33.33% | 4.10% | **7.31%** | 🚨 **Severe Neutral Collapse** |
+| | Neutral ($n=268$) | 33.33% | 4.10% | **7.31%** | **Severe Neutral Collapse** |
 | | Positive ($n=478$) | 69.17% | 61.18% | 64.93% | Moderate positive recognition |
 | **XGBoost** | Negative ($n=532$) | 63.97% | 86.57% | 73.57% | Strong negative recognition |
-| | Neutral ($n=268$) | 40.00% | 11.94% | **18.39%** | ⚠️ **Severe Neutral Collapse** |
+| | Neutral ($n=268$) | 40.00% | 11.94% | **18.39%** | **Severe Neutral Collapse** |
 | | Positive ($n=478$) | 69.37% | 65.11% | 67.17% | Moderate positive recognition |
 | **IndoBERT (base-p1)** | Negative ($n=532$) | 73.05% | 75.95% | **74.47%** | Balanced precision & recall |
-| | Neutral ($n=268$) | 36.61% | 45.90% | **40.73%** | 🎯 **Neutral Collapse Resolved (+22.34 pp)** |
+| | Neutral ($n=268$) | 36.61% | 45.90% | **40.73%** | **Neutral Collapse Resolved (+22.34 pp)** |
 | | Positive ($n=478$) | **80.32%** | 62.16% | **70.08%** | High-precision positive identification |
 | **IndoBERTweet** | Negative ($n=532$) | 75.27% | 70.15% | 72.62% | Robust negative identification |
-| | Neutral ($n=268$) | 34.78% | **53.73%** | **42.23%** | 🚀 **Highest Neutral Recall & F1** |
+| | Neutral ($n=268$) | 34.78% | **53.73%** | **42.23%** | **Highest Neutral Recall & F1** |
 | | Positive ($n=478$) | **80.79%** | 59.95% | 68.83% | High-precision positive identification |
 
 As shown in Table IV, the apparent competitiveness of Random Forest and XGBoost in aggregate accuracy (62.60% and 64.08%) is an artifact of majority-class domination:
@@ -318,7 +316,7 @@ With 1 degree of freedom, this corresponds to an asymptotic $p$-value of **$p = 
 **Critical Methodological Insight:** A naive researcher might interpret this result as evidence that IndoBERT offers no meaningful advantage over XGBoost. However, a deeper mathematical inspection illuminates why:
 1. **Majority Class Masking:** Total accuracy is overwhelmingly dominated by the majority Negative (41.6%) and Positive (37.4%) classes. In aggregate accuracy, IndoBERT corrects 153 errors made by XGBoost, but XGBoost also correctly predicts 138 instances where IndoBERT faltered, resulting in a modest net aggregate gain of **+15 correct reviews** (834 vs. 819).
 2. **Statistically Overwhelming Advantage on the Minority Class:** When McNemar's contingency analysis is restricted specifically to the **minority Neutral class subset ($N = 268$)**, IndoBERT correctly classifies **123 samples** compared to only **32 samples** for XGBoost. Among discordant pairs in this class ($n_{10} = 97$, $n_{01} = 6$):
-$$\chi^2_{\text{Neutral}} = \frac{(|97 - 6| - 1)^2}{97 + 6} = \frac{(90)^2}{103} = \frac{8,100}{103} \approx \mathbf{71.68} \quad (\mathbf{p < 0.0001})$$
+$$\chi^2_{\text{Neutral}} = \frac{(|97 - 6| - 1)^2}{97 + 6} = \frac{(90)^2}{103} = \frac{8,100}{103} \approx \mathbf{78.64} \quad (\mathbf{p < 0.0001})$$
 This proves conclusively that IndoBERT's superiority is **statistically overwhelmingly significant ($p < 10^{-16}$)** in resolving the core bottleneck of this task: **Macro-F1 elevation (+8.71 pp) and neutral class restoration (+22.34 pp)**, whereas overall aggregate accuracy is constrained by the statistical inertia of majority class boundaries.
 
 ### F. Qualitative Linguistic Error Analysis
@@ -418,7 +416,7 @@ To translate these empirical findings into actionable enterprise utility, Figure
 
 This empirical study presented a comprehensive comparative investigation between traditional tree-based machine learning ensembles and deep contextual Transformer architectures on a multi-vendor Indonesian e-commerce customer review corpus. By curating 12,777 cleaned reviews across Tokopedia, Shopee, Lazada, and Bukalapak, supported by a formal human inter-annotator agreement study ($\kappa = 0.8662$) and an 89.39% heuristic consistency audit, we established an open, reproducible evaluation benchmark.
 
-Our empirical findings demonstrate that fine-tuned IndoBERT-base-p1 achieves superior overall predictive capability, securing **65.26% accuracy, 61.76% Macro-F1, and an ROC-AUC of 0.8055**. Crucially, while Random Forest and XGBoost suffered severe Neutral Collapse (neutral F1-scores of 7.31% and 18.39%), IndoBERT successfully restored the neutral class to **40.73% F1 (+22.34 pp)** through the integration of Class-Weighted Cross-Entropy Loss, while the social-domain IndoBERTweet achieved **42.23% neutral F1**. Synthetic oversampling via SMOTE failed to alleviate contextual ambiguity, deteriorating overall XGBoost accuracy by 3.28 pp. A modular four-stage ablation study verified that domain-specific slang normalization (+1.48 pp), extended context length (+2.53 pp), and class-weighted loss (+3.79 pp) each contribute indispensable performance gains. Furthermore, a dual-level McNemar statistical analysis demonstrated that while overall aggregate accuracy margins represent a balanced net shift of +15 samples masked by majority-class inertia, IndoBERT is statistically overwhelmingly superior on the minority neutral class ($\chi^2 = 71.68, p < 0.0001$). Finally, qualitative analysis of 20 failure cases demonstrated IndoBERT's unique capability to resolve litotes, comparative brand criticism, and multi-clause constructive feedback.
+Our empirical findings demonstrate that fine-tuned IndoBERT-base-p1 achieves superior overall predictive capability, securing **65.26% accuracy, 61.76% Macro-F1, and an ROC-AUC of 0.8055**. Crucially, while Random Forest and XGBoost suffered severe Neutral Collapse (neutral F1-scores of 7.31% and 18.39%), IndoBERT successfully restored the neutral class to **40.73% F1 (+22.34 pp)** through the integration of Class-Weighted Cross-Entropy Loss, while the social-domain IndoBERTweet achieved **42.23% neutral F1**. Synthetic oversampling via SMOTE failed to alleviate contextual ambiguity, deteriorating overall XGBoost accuracy by 3.28 pp. A modular four-stage ablation study verified that domain-specific slang normalization (+1.48 pp), extended context length (+2.53 pp), and class-weighted loss (+3.79 pp) each contribute indispensable performance gains. Furthermore, a dual-level McNemar statistical analysis demonstrated that while overall aggregate accuracy margins represent a balanced net shift of +15 samples masked by majority-class inertia, IndoBERT is statistically overwhelmingly superior on the minority neutral class ($\chi^2 = 78.64, p < 0.0001$). Finally, qualitative analysis of 20 failure cases demonstrated IndoBERT's unique capability to resolve litotes, comparative brand criticism, and multi-clause constructive feedback.
 
 Future research will explore:
 1. Incorporating multi-modal feedback channels (e.g., image attachments in customer reviews depicting damaged merchandise or incorrect product packaging);
@@ -436,42 +434,54 @@ All code, curated dataset splits, normalization lexicons, evaluation checkpoints
 
 ## REFERENCES
 
-[1] L. Breiman, "Random forests," *Machine Learning*, vol. 45, no. 1, pp. 5–32, Oct. 2001, doi: 10.1023/A:1010933404324.
+[1] B. Liu, *Sentiment Analysis and Opinion Mining*. San Rafael, CA, USA: Morgan & Claypool Publishers, May 2012, doi: 10.2200/S00416ED1V01Y201204HLT016.
 
-[2] T. Chen and C. Guestrin, "XGBoost: A scalable tree boosting system," in *Proc. 22nd ACM SIGKDD Int. Conf. Knowl. Discovery Data Mining*, San Francisco, CA, USA, Aug. 2016, pp. 785–794, doi: 10.1145/2939672.2939785.
+[2] W. T. Coombs, *Ongoing Crisis Communication: Planning, Managing, and Responding*, 5th ed. Thousand Oaks, CA, USA: SAGE Publications, 2019.
 
-[3] J. Devlin, M.-W. Chang, K. Lee, and K. Toutanova, "BERT: Pre-training of deep bidirectional transformers for language understanding," in *Proc. 2019 Conf. North Amer. Chapter Assoc. Comput. Linguistics: Human Lang. Technol. (NAACL-HLT)*, Minneapolis, MN, USA, Jun. 2019, pp. 4171–4186.
+[3] D. Lou and C. Yuan, "Influencer marketing: How message value and credibility affect consumer trust of branded content on social media," *Journal of Interactive Advertising*, vol. 19, no. 1, pp. 58–73, Feb. 2019, doi: 10.1080/15252019.2018.1533501.
 
 [4] E. Yulianti and N. K. Nissa, "ABSA of Indonesian customer reviews using IndoBERT: Single-sentence and sentence-pair classification approaches," *Bulletin of Electrical Engineering and Informatics (BEEI)*, vol. 13, no. 5, pp. 3579–3589, Oct. 2024, doi: 10.11591/eei.v13i5.8032.
 
 [5] R. Anadra, H. Wijayanto, and K. Sadik, "Sentiment analysis of Tokopedia customer reviews using BiLSTM and IndoBERT with comparative analysis of preprocessing and labeling methods," *International Journal of Advances in Data and Information Systems (IJADIS)*, vol. 6, no. 3, pp. 773–788, Dec. 2025, doi: 10.59395/ijadis.v6i3.1458.
 
-[6] P. Sayarizki, Hasmawati, and H. Nurrahmi, "Implementation of IndoBERT for sentiment analysis of Indonesian presidential candidates," *Indonesian Journal on Computing (Indo-JC)*, vol. 9, no. 2, pp. 61–72, Aug. 2024.
+[6] F. Koto and G. Y. Rahmaningtyas, "InSet lexicon: Evaluation of a word list for Indonesian sentiment analysis in microblogs," in *Proc. Int. Conf. Asian Lang. Process. (IALP)*, Singapore, Dec. 2017, pp. 391–394, doi: 10.1109/IALP.2017.8300625.
 
-[7] A. Y. Imran, M. R. Sanjaya, B. W. Putra, and G. E. H. Cahyadi, "Optimization of sentiment analysis on Tokopedia user reviews using GridSearchCV and SMOTE with machine learning algorithms," *Jurnal Inovtek Polbeng - Seri Informatika*, vol. 10, no. 3, pp. 412–424, Dec. 2025.
+[7] M. O. Ibrohim and I. Budi, "Multi-label hate speech and abusive language detection in Indonesian Twitter," in *Proc. 3rd Workshop Abusive Lang. Online (ALW3)*, Florence, Italy, Aug. 2019, pp. 46–57, doi: 10.18653/v1/W19-3506.
 
 [8] N. Z. Zahra et al., "Benchmarking logistic regression, SVM, naive Bayes, and IndoBERT fine-tuning for sentiment analysis on Indonesian product reviews," *arXiv preprint arXiv:2605.03439*, May 2026.
 
 [9] A. Tikaningsih, I. Tahyudin, and Berlilana, "Two-stage framework using IndoBERT for sentiment analysis of Tokopedia reviews under extreme class imbalance," *Sinkron: Jurnal dan Penelitian Teknik Informatika*, vol. 10, no. 3, pp. 1733–1744, Jul. 2026, doi: 10.33395/sinkron.v10i3.16187.
 
-[10] N. V. Chawla, K. W. Bowyer, L. O. Hall, and W. P. Kegelmeyer, "SMOTE: Synthetic minority over-sampling technique," *Journal of Artificial Intelligence Research*, vol. 16, pp. 321–357, Jun. 2002, doi: 10.1613/jair.953.
+[10] L. Breiman, "Random forests," *Machine Learning*, vol. 45, no. 1, pp. 5–32, Oct. 2001, doi: 10.1023/A:1010933404324.
 
-[11] Y. Cui, M. Jia, T.-Y. Lin, Y. Song, and S. Belongie, "Class-balanced loss based on effective number of samples," in *Proc. IEEE/CVF Conf. Comput. Vision Pattern Recognit. (CVPR)*, Long Beach, CA, USA, Jun. 2019, pp. 9268–9277, doi: 10.1109/CVPR.2019.00949.
+[11] T. Chen and C. Guestrin, "XGBoost: A scalable tree boosting system," in *Proc. 22nd ACM SIGKDD Int. Conf. Knowl. Discovery Data Mining*, San Francisco, CA, USA, Aug. 2016, pp. 785–794, doi: 10.1145/2939672.2939785.
 
-[12] D. A. Kristiyanti, S. A. Sanjaya, V. C. Tjokro, and J. Suhali, "Dealing imbalance dataset problem in sentiment analysis of recession in Indonesia," *IAES International Journal of Artificial Intelligence (IJ-AI)*, vol. 13, no. 2, pp. 2058–2070, Jun. 2024, doi: 10.11591/ijai.v13.i2.pp2060-2072.
+[12] N. V. Chawla, K. W. Bowyer, L. O. Hall, and W. P. Kegelmeyer, "SMOTE: Synthetic minority over-sampling technique," *Journal of Artificial Intelligence Research*, vol. 16, pp. 321–357, Jun. 2002, doi: 10.1613/jair.953.
 
-[13] F. Koto, A. Rahimi, J. H. Lau, and T. Baldwin, "IndoLEM and IndoBERT: A benchmark dataset and pre-trained language model for Indonesian NLP," in *Proc. 28th Int. Conf. Comput. Linguistics (COLING 2020)*, Barcelona, Spain, Dec. 2020, pp. 757–770.
+[13] Y. Cui, M. Jia, T.-Y. Lin, Y. Song, and S. Belongie, "Class-balanced loss based on effective number of samples," in *Proc. IEEE/CVF Conf. Comput. Vision Pattern Recognit. (CVPR)*, Long Beach, CA, USA, Jun. 2019, pp. 9268–9277, doi: 10.1109/CVPR.2019.00949.
 
-[14] B. Wilie et al., "IndoNLU: Benchmark and resources for evaluating Indonesian natural language understanding," in *Proc. 1st Conf. Asia-Pacific Chapter Assoc. Comput. Linguistics 10th Int. Joint Conf. Natural Lang. Process. (AACL-IJCNLP 2020)*, Suzhou, China, Dec. 2020, pp. 843–860.
+[14] D. A. Kristiyanti, S. A. Sanjaya, V. C. Tjokro, and J. Suhali, "Dealing imbalance dataset problem in sentiment analysis of recession in Indonesia," *IAES International Journal of Artificial Intelligence (IJ-AI)*, vol. 13, no. 2, pp. 2058–2070, Jun. 2024, doi: 10.11591/ijai.v13.i2.pp2060-2072.
 
-[15] F. Koto, A. Rahimi, J. H. Lau, and T. Baldwin, "IndoBERTweet: A pre-trained language model for Indonesian Twitter with effective domain-specific vocabulary initialization," in *Proc. 2021 Conf. Empirical Methods Natural Lang. Process. (EMNLP 2021)*, Punta Cana, Dominican Republic, Nov. 2021, pp. 10660–10668.
+[15] F. Koto, A. Rahimi, J. H. Lau, and T. Baldwin, "IndoLEM and IndoBERT: A benchmark dataset and pre-trained language model for Indonesian NLP," in *Proc. 28th Int. Conf. Comput. Linguistics (COLING 2020)*, Barcelona, Spain, Dec. 2020, pp. 757–770.
 
-[16] T. Ramadhan and K. Kusnawi, "Performance comparison of IndoBERT and Bi-LSTM models for sentiment analysis of Shopee app users in Indonesia," *Journal of Applied Informatics and Computing (JAIC)*, vol. 10, no. 2, pp. 2076–2085, Apr. 2026.
+[16] B. Wilie et al., "IndoNLU: Benchmark and resources for evaluating Indonesian natural language understanding," in *Proc. 1st Conf. Asia-Pacific Chapter Assoc. Comput. Linguistics 10th Int. Joint Conf. Natural Lang. Process. (AACL-IJCNLP 2020)*, Suzhou, China, Dec. 2020, pp. 843–860.
 
-[17] A. A. P. Simarmata and T. B. Sasongko, "Sentiment analysis on BRImo application reviews using IndoBERT," *Journal of Applied Informatics and Computing (JAIC)*, vol. 9, no. 3, pp. 851–862, Dec. 2025.
+[17] F. Koto, A. Rahimi, J. H. Lau, and T. Baldwin, "IndoBERTweet: A pre-trained language model for Indonesian Twitter with effective domain-specific vocabulary initialization," in *Proc. 2021 Conf. Empirical Methods Natural Lang. Process. (EMNLP 2021)*, Punta Cana, Dominican Republic, Nov. 2021, pp. 10660–10668.
 
 [18] L. Geni, E. Yulianti, and D. I. Sensuse, "Sentiment analysis of tweets before the 2024 elections in Indonesia using BERT language models," *Jurnal Ilmiah Teknik Elektro Komputer dan Informatika (JITEKI)*, vol. 9, no. 3, pp. 746–757, Sep. 2023, doi: 10.26555/jiteki.v9i3.26490.
 
 [19] T. G. Dietterich, "Approximate statistical tests for comparing supervised classification learning algorithms," *Neural Computation*, vol. 10, no. 7, pp. 1895–1923, Oct. 1998, doi: 10.1162/089976698300017197.
 
-[20] D. Marutho and V. G. Utomo, "Benchmarking IndoBERT and transformer models for sentiment classification on Indonesian e-government service reviews," *Transformatika*, vol. 23, no. 1, pp. 45–58, Jan. 2025.
+[20] T. Ramadhan and K. Kusnawi, "Performance comparison of IndoBERT and Bi-LSTM models for sentiment analysis of Shopee app users in Indonesia," *Journal of Applied Informatics and Computing (JAIC)*, vol. 10, no. 2, pp. 2076–2085, Apr. 2026.
+
+[21] A. A. P. Simarmata and T. B. Sasongko, "Sentiment analysis on BRImo application reviews using IndoBERT," *Journal of Applied Informatics and Computing (JAIC)*, vol. 9, no. 3, pp. 851–862, Dec. 2025.
+
+[22] D. Marutho and V. G. Utomo, "Benchmarking IndoBERT and transformer models for sentiment classification on Indonesian e-government service reviews," *Transformatika*, vol. 23, no. 1, pp. 45–58, Jan. 2025.
+
+[23] J. Devlin, M.-W. Chang, K. Lee, and K. Toutanova, "BERT: Pre-training of deep bidirectional transformers for language understanding," in *Proc. 2019 Conf. North Amer. Chapter Assoc. Comput. Linguistics: Human Lang. Technol. (NAACL-HLT)*, Minneapolis, MN, USA, Jun. 2019, pp. 4171–4186.
+
+[24] A. Y. Imran, M. R. Sanjaya, B. W. Putra, and G. E. H. Cahyadi, "Optimization of sentiment analysis on Tokopedia user reviews using GridSearchCV and SMOTE with machine learning algorithms," *Jurnal Inovtek Polbeng - Seri Informatika*, vol. 10, no. 3, pp. 412–424, Dec. 2025.
+
+[25] P. Sayarizki, Hasmawati, and H. Nurrahmi, "Implementation of IndoBERT for sentiment analysis of Indonesian presidential candidates," *Indonesian Journal on Computing (Indo-JC)*, vol. 9, no. 2, pp. 61–72, Aug. 2024.
+
+[26] J. R. Landis and G. G. Koch, "The measurement of observer agreement for categorical data," *Biometrics*, vol. 33, no. 1, pp. 159–174, Mar. 1977, doi: 10.2307/2529310.

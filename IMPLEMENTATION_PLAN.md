@@ -91,7 +91,7 @@ Dokumen ini memuat rencana kerja terstruktur, perbaikan metodologis, arsitektur 
   - [x] Update Figure 5 (`figure5_f1_comparison_barplot.png`) dan Figure 2 (`figure2_wordcloud_per_class.png`)
   - [x] Update Figure 4 (`figure4_confusion_matrix_comparison.png`)
   - [x] Jalankan Ablation Study (Table 4: Pengaruh Slang, Disambiguation, Length 256, dan Weighted Loss)
-  - [x] Hitung ulang McNemar’s Test statistik (153 vs 138 koreksi, net +15, $\chi^2 = 0,6735, p = 0,4118$; serta $\chi^2 = 71,68, p < 0,0001$ pada kelas Netral)
+  - [x] Hitung ulang McNemar’s Test statistik (153 vs 138 koreksi, net +15, $\chi^2 = 0,6735, p = 0,4118$; serta $\chi^2 = 78,64, p < 0,0001$ pada kelas Netral)
   - [x] Ekstraksi 20 sampel kualitatif linguistik baru ke `error_analysis_samples.csv`
 
 - [x] **Tahap B5: Final Handoff Package & Documentation Sync**
@@ -124,7 +124,7 @@ cobapenelitianpart4/
 │   ├── figure5_f1_comparison_barplot.png        # Gambar 5: Barplot komparasi F1-Score per kelas
 │   ├── cohen_kappa_inter_annotator_agreement.json # Validasi independen 2 penilai (kappa = 0.8662)
 │   ├── label_consistency_audit.json             # Audit konsistensi aturan leksikal-rating (89.39%)
-│   ├── mcnemar_test.json                        # Hasil uji signifikansi statistik McNemar (chi2 = 0.6735, p = 0.4118 & chi2 = 71.68, p < 0.0001)
+│   ├── mcnemar_test.json                        # Hasil uji signifikansi statistik McNemar (chi2 = 0.6735, p = 0.4118 & chi2 = 78.64, p < 0.0001)
 │   └── error_analysis_samples.csv               # 20 kasus linguistik mendalam (sarkasme, negasi ganda)
 │
 ├── data/
