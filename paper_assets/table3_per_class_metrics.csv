@@ -8,3 +8,6 @@ XGBoost (TF-IDF),2,Positif,69.37%,65.11%,67.17%,407
 IndoBERT (Fine-Tuned),0,Negatif,73.05%,75.95%,74.47%,603
 IndoBERT (Fine-Tuned),1,Netral,36.61%,45.90%,40.73%,268
 IndoBERT (Fine-Tuned),2,Positif,80.32%,62.16%,70.08%,407
+IndoBERTweet (Fine-Tuned),0,Negatif,75.27%,70.15%,72.62%,603
+IndoBERTweet (Fine-Tuned),1,Netral,34.78%,53.73%,42.23%,268
+IndoBERTweet (Fine-Tuned),2,Positif,80.79%,59.95%,68.83%,407

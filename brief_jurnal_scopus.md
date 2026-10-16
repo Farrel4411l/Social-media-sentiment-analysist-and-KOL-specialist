@@ -113,7 +113,8 @@ Date: 2026-10-16
 |---|---|:---:|:---:|:---:|
 | **Random Forest** | Precision / Recall / F1 | 61,02% / 89,55% / 72,58% | 33,33% / 4,10% / **7,31%** | 69,17% / 61,18% / 64,93% |
 | **XGBoost** | Precision / Recall / F1 | 63,97% / 86,57% / 73,57% | 40,00% / 11,94% / **18,39%** | 69,37% / 65,11% / 67,17% |
-| **IndoBERT** | Precision / Recall / F1 | 73,05% / 75,95% / **74,47%** | 36,61% / 45,90% / **40,73%** | 80,32% / 62,16% / **70,08%** |
+| **IndoBERT (base-p1)** | Precision / Recall / F1 | 73,05% / 75,95% / **74,47%** | 36,61% / 45,90% / **40,73%** | 80,32% / 62,16% / **70,08%** |
+| **IndoBERTweet (uncased)** | Precision / Recall / F1 | 75,27% / 70,15% / 72,62% | 34,78% / 53,73% / **42,23%** | 80,79% / 59,95% / 68,83% |
 
 - Model *tree-based* mengalami *Neutral Collapse* parah (F1 Netral RF hanya 7,31%, XGBoost 18,39%) karena kata-kata netral tidak memiliki bobot polaritas frekuensi dominan dalam TF-IDF.
 - Sebaliknya, IndoBERT dengan *Class-Weighted Cross-Entropy Loss* berhasil mempertahankan **F1 Netral di 40,73%** (Recall 45,90%), memecahkan masalah kolaps kelas netral tanpa mengorbankan F1 Negatif (74,47%) maupun Positif (70,08%).
@@ -134,7 +135,7 @@ Date: 2026-10-16
   - Keduanya salah ($n_{00}$): 306 sampel
   - IndoBERT benar & XGBoost salah ($n_{10}$): **153 sampel**
   - XGBoost benar & IndoBERT salah ($n_{01}$): 138 sampel
-- **Interpretasi Statistik Rigor:** Berdasarkan prosedur Dietterich (1998), uji McNemar dengan koreksi kontinuitas pada akurasi keseluruhan menghasilkan $\chi^2 = 0,6735$ dengan $p = 0,4118$ ($p > 0,05$). Hal ini menunjukkan bahwa perbedaan akurasi agregat keseluruhan (65,26% vs 64,08%) tidak signifikan secara statistik karena metrik akurasi total didominasi dan tertutupi (*masked*) oleh proporsi kelas mayoritas (Negatif dan Positif). Sebaliknya, secara fungsional IndoBERT berhasil mengoreksi **153 kesalahan klasifikasi semantik** yang gagal ditangani XGBoost, sehingga signifikansi keunggulan praktis IndoBERT terwujud secara nyata pada lonjakan **Macro-F1 (+8,71%)** dan **pemulihan kelas minoritas Netral (+22,34%)**.
+- **Interpretasi Statistik Rigor (Agregat vs Per-Kelas Minoritas):** Berdasarkan prosedur Dietterich (1998), uji McNemar dengan koreksi kontinuitas pada akurasi keseluruhan menghasilkan $\chi^2 = 0,6735$ dengan $p = 0,4118$ ($p > 0,05$). Hal ini menunjukkan bahwa perbedaan akurasi agregat keseluruhan (65,26% vs 64,08%) tidak signifikan secara statistik karena metrik akurasi total didominasi dan tertutupi (*masked*) oleh proporsi kelas mayoritas (Negatif dan Positif). Sebaliknya, pada **pengujian McNemar khusus subset kelas minoritas Netral ($N=268$)**, IndoBERT mengungguli XGBoost secara sangat signifikan (**123 benar vs 32 benar; $\chi^2 = 71,68, p < 0,0001$**), serta secara keseluruhan mengoreksi **153 kesalahan klasifikasi semantik** XGBoost. Dengan demikian, klaim keunggulan IndoBERT difokuskan secara akurat pada lonjakan **Macro-F1 (+8,71pp)** dan **pemulihan kelas minoritas Netral (+22,34pp, $p < 0,0001$)**, sementara setara pada akurasi agregat.
 
 #### 6. Qualitative Error Analysis (Rujuk `paper_assets/error_analysis_samples.csv` — 20 Sampel Terkurasi)
 - **Kasus Negasi Ganda / Litotes (Positif — Sample #1, #2, #3):**

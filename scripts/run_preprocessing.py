@@ -255,29 +255,24 @@ def main():
     sample_500["ground_truth_label"] = ground_truth_labels
     sample_500["rule_label"] = sample_500["label"].values
     
-    kappa_score = cohen_kappa_score(sample_500["rule_label"], sample_500["ground_truth_label"])
-    logger.info(f"Inter-Annotator Agreement (Cohen's Kappa): kappa = {kappa_score:.4f}")
+    audit_score = cohen_kappa_score(sample_500["rule_label"], sample_500["ground_truth_label"])
+    logger.info(f"Internal Heuristic & Rule Consistency Audit Score: {audit_score:.4f}")
     
-    kappa_metadata = {
-        "Metric": "Cohen's Kappa Coefficient (Inter-Annotator Agreement)",
+    audit_metadata = {
+        "Evaluation_Type": "Internal Heuristic & Rule Consistency Audit",
         "Sample_Size": 500,
-        "Sampling_Method": "Stratified Random Sampling from Cleaned Corpus",
-        "Kappa_Score": round(kappa_score, 4),
-        "Interpretation": "Almost Perfect / Substantial Agreement (kappa >= 0.70)",
-        "Standard_Error": round(np.sqrt((1 - kappa_score) / 500), 4),
-        "P_Value": "< 0.0001 (Highly Statistically Significant)"
+        "Methodology": "Verification between initial rating heuristics and lexicon-based polarity rules",
+        "Consistency_Agreement_Score": round(audit_score, 4),
+        "Disclaimer": "This metric represents algorithmic self-consistency between rating brackets and sentiment lexicon rules during data cleaning, distinct from independent human inter-annotator agreement."
     }
     
     os.makedirs("data/results", exist_ok=True)
-    with open("data/results/cohen_kappa_validation.json", "w", encoding="utf-8") as f:
-        json.dump(kappa_metadata, f, indent=2)
-    with open("paper_assets/cohen_kappa_validation.json", "w", encoding="utf-8") as f:
-        json.dump(kappa_metadata, f, indent=2)
+    with open("data/results/label_consistency_audit.json", "w", encoding="utf-8") as f:
+        json.dump(audit_metadata, f, indent=2)
+    with open("paper_assets/label_consistency_audit.json", "w", encoding="utf-8") as f:
+        json.dump(audit_metadata, f, indent=2)
         
-    sample_500[["reviewId", "app_name", "score", "rule_label", "ground_truth_label", "cleaned_text"]].to_csv(
-        "data/manual_validation_500.csv", index=False, encoding="utf-8"
-    )
-    logger.info("Saved: data/manual_validation_500.csv & paper_assets/cohen_kappa_validation.json")
+    logger.info("Saved: paper_assets/label_consistency_audit.json (Internal Heuristic Consistency Audit)")
     
     # 9. Update Table 1: Dataset Statistics
     df_final["char_len"] = df_final["cleaned_text"].str.len()
