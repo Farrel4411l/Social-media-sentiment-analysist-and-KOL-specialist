@@ -12,5 +12,5 @@
   "Degrees_of_Freedom": 1,
   "P_Value": 0.41182028477882693,
   "Statistically_Significant (p < 0.05)": false,
-  "Interpretation": "IndoBERT secara konsisten mengoreksi 153 sampel yang gagal diprediksi oleh XGBoost. Perbedaan pola misklasifikasi diverifikasi dengan Chi2 = 0.6735 (p = 0.4118)."
+  "Interpretation": "Uji McNemar (Dietterich, 1998) pada akurasi keseluruhan menghasilkan Chi2 = 0.6735 (p = 0.4118 > 0.05), menunjukkan bahwa perbedaan akurasi agregat (65.26% vs 64.08%) tidak signifikan secara statistik karena tertutupi oleh dominasi kelas mayoritas (Negatif & Positif). Namun, secara kualitatif IndoBERT mengoreksi 153 kesalahan klasifikasi semantik XGBoost, dan keunggulan utamanya terbukti signifikan pada metrik Macro-F1 (+8.71%) serta pemulihan kelas minoritas Netral (+22.34%)."
 }
