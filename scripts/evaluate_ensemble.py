@@ -148,6 +148,11 @@ def main():
     elif os.path.exists("models/indobert_smoothed_finetuned/checkpoint-639/config.json"):
         models["IndoBERT-Smoothed"] = "models/indobert_smoothed_finetuned/checkpoint-639"
 
+    if os.path.exists("models/xlm_roberta_finetuned/config.json"):
+        models["XLM-RoBERTa"] = "models/xlm_roberta_finetuned"
+    elif os.path.exists("models/xlm_roberta_finetuned/checkpoint-639/config.json"):
+        models["XLM-RoBERTa"] = "models/xlm_roberta_finetuned/checkpoint-639"
+
     val_probs_dict = {}
     test_probs_dict = {}
 

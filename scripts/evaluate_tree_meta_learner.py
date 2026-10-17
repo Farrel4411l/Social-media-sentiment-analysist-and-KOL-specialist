@@ -46,6 +46,7 @@ def main():
         "IndoBERT-Large": "models/indobert_large_finetuned/checkpoint-639",
         "IndoBERT-Focal": "models/indobert_focal_finetuned",
         "IndoBERT-Smoothed": "models/indobert_smoothed_finetuned",
+        "XLM-RoBERTa": "models/xlm_roberta_finetuned",
     }
 
     val_probs = []
