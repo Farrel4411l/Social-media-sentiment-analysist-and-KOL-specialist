@@ -41,5 +41,6 @@ models/rf_tfidf.pkl
 *.safetensors
 *.pt
 *.pth
-models/indobert_finetuned/checkpoint-*/
-models/indobertweet_finetuned/checkpoint-*/
+models/*/checkpoint-*/
+models/indobert_10epochs/
+models/indobert_large_finetuned/

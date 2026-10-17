@@ -1,0 +1,28 @@
+2026-10-18 00:40:41,270 [INFO] ================================================================================
+2026-10-18 00:40:41,270 [INFO] INDOBERT-LARGE FINE-TUNING EXPERIMENT (335M PARAMS - TARGET >= 80% ACCURACY)
+2026-10-18 00:40:41,270 [INFO] ================================================================================
+2026-10-18 00:40:41,327 [INFO] Hardware Accelerator: cuda (NVIDIA GeForce RTX 4070 Laptop GPU)
+2026-10-18 00:40:41,425 [INFO] Partisi Data: Train=10,221, Val=1,278, Test=1,278
+2026-10-18 00:40:41,427 [INFO] Memuat Pretrained Tokenizer & Model: indobenchmark/indobert-large-p1...
+2026-10-18 00:40:43,488 [INFO] Membangun PyTorch Datasets (max_length=256)...
+2026-10-18 00:40:43,888 [INFO] 
+----------------------------------------------------------------------
+2026-10-18 00:40:43,888 [INFO] MEMULAI PELATIHAN INDOBERT-LARGE (BATCH=8, GRAD_ACCUM=2, LR=1e-5)...
+2026-10-18 00:40:43,889 [INFO] ----------------------------------------------------------------------
+2026-10-18 00:58:10,643 [INFO] [INDOBERT-LARGE EPOCH 1 EVAL] Train Loss: 0.8997 | Val Loss: 0.8681 | Val Acc: 62.05% | Val Macro-F1: 58.98% | F1 Neutral: 38.12%
+2026-10-18 01:15:41,434 [INFO] [INDOBERT-LARGE EPOCH 2 EVAL] Train Loss: 0.8144 | Val Loss: 0.8520 | Val Acc: 61.97% | Val Macro-F1: 59.54% | F1 Neutral: 39.28%
+2026-10-18 01:33:12,366 [INFO] [INDOBERT-LARGE EPOCH 3 EVAL] Train Loss: 0.6203 | Val Loss: 0.9558 | Val Acc: 58.84% | Val Macro-F1: 56.22% | F1 Neutral: 35.16%
+2026-10-18 01:33:17,783 [INFO] Pelatihan IndoBERT-Large selesai dalam 3153.89 detik (52.56 menit).
+2026-10-18 01:33:17,788 [INFO] Saved: data/results/epoch_history_indobert_large.csv
+2026-10-18 01:33:19,271 [INFO] Saved: paper_assets/figure3_training_curves_indobert_large.png (300 DPI)
+2026-10-18 01:33:19,271 [INFO] 
+----------------------------------------------------------------------
+2026-10-18 01:33:19,271 [INFO] EVALUASI TEST SET INDOBERT-LARGE (N = 1.278)...
+2026-10-18 01:33:19,271 [INFO] ----------------------------------------------------------------------
+2026-10-18 01:33:29,075 [INFO] Saved: data/results/metrics_indobert_large.csv
+2026-10-18 01:33:29,524 [INFO] Saved: paper_assets/figure4_confusion_matrix_indobert_large.png (300 DPI)
+2026-10-18 01:33:29,525 [INFO] 
+================================================================================
+2026-10-18 01:33:29,525 [INFO] HASIL TEST SET INDOBERT-LARGE: Accuracy = 63.93%, Macro-F1 = 61.50%
+2026-10-18 01:33:29,525 [INFO] Target 80% Tercapai: TIDAK (BELUM TERCAPAI)
+2026-10-18 01:33:29,525 [INFO] ================================================================================

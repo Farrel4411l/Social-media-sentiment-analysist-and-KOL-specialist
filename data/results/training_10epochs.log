@@ -1,0 +1,37 @@
+2026-10-18 00:15:09,726 [INFO] ================================================================================
+2026-10-18 00:15:09,727 [INFO] INDOBERT 10-EPOCH FINE-TUNING EXPERIMENT (TARGET ACCURACY >= 80% AUDIT)
+2026-10-18 00:15:09,727 [INFO] ================================================================================
+2026-10-18 00:15:09,765 [INFO] Hardware Accelerator: cuda (NVIDIA GeForce RTX 4070 Laptop GPU)
+2026-10-18 00:15:09,880 [INFO] Partisi Data Terverifikasi: Train=10,221, Val=1,278, Test=1,278
+2026-10-18 00:15:09,896 [INFO] Distribusi Kelas Latih: [4819 2141 3261]
+2026-10-18 00:15:09,898 [INFO] Class Weights (w_0, w_1, w_2): [0.7069931626319885, 1.5913125276565552, 1.0447715520858765]
+2026-10-18 00:15:09,899 [INFO] Memuat Pretrained Tokenizer & Model: indobenchmark/indobert-base-p1...
+2026-10-18 00:15:11,841 [INFO] Membangun PyTorch Tensor Datasets (max_length=256)...
+2026-10-18 00:15:12,132 [INFO] 
+----------------------------------------------------------------------
+2026-10-18 00:15:12,132 [INFO] MEMULAI 10 EPOCH INDOBERT FINE-TUNING (COSINE SCHEDULER, WEIGHT DECAY=0.05)...
+2026-10-18 00:15:12,132 [INFO] ----------------------------------------------------------------------
+2026-10-18 00:17:08,105 [INFO] [EPOCH 1/10 EVAL] Train Loss: 0.9182 | Val Loss: 0.9110 | Val Acc: 59.47% | Val Macro-F1: 56.41% | F1 Neutral: 37.28%
+2026-10-18 00:19:03,545 [INFO] [EPOCH 2/10 EVAL] Train Loss: 0.8312 | Val Loss: 0.8857 | Val Acc: 61.97% | Val Macro-F1: 58.83% | F1 Neutral: 38.95%
+2026-10-18 00:20:58,959 [INFO] [EPOCH 3/10 EVAL] Train Loss: 0.6690 | Val Loss: 1.0034 | Val Acc: 59.70% | Val Macro-F1: 53.56% | F1 Neutral: 26.83%
+2026-10-18 00:22:54,430 [INFO] [EPOCH 4/10 EVAL] Train Loss: 0.4836 | Val Loss: 1.2358 | Val Acc: 60.80% | Val Macro-F1: 56.92% | F1 Neutral: 36.52%
+2026-10-18 00:24:50,125 [INFO] [EPOCH 5/10 EVAL] Train Loss: 0.2973 | Val Loss: 1.7036 | Val Acc: 59.08% | Val Macro-F1: 54.88% | F1 Neutral: 32.10%
+2026-10-18 00:26:45,986 [INFO] [EPOCH 6/10 EVAL] Train Loss: 0.1857 | Val Loss: 2.1818 | Val Acc: 58.76% | Val Macro-F1: 54.81% | F1 Neutral: 32.15%
+2026-10-18 00:28:44,417 [INFO] [EPOCH 7/10 EVAL] Train Loss: 0.1231 | Val Loss: 2.7560 | Val Acc: 57.75% | Val Macro-F1: 53.71% | F1 Neutral: 31.01%
+2026-10-18 00:30:40,782 [INFO] [EPOCH 8/10 EVAL] Train Loss: 0.0615 | Val Loss: 3.1011 | Val Acc: 59.08% | Val Macro-F1: 53.67% | F1 Neutral: 28.85%
+2026-10-18 00:32:36,532 [INFO] [EPOCH 9/10 EVAL] Train Loss: 0.0407 | Val Loss: 3.1166 | Val Acc: 58.06% | Val Macro-F1: 53.43% | F1 Neutral: 29.45%
+2026-10-18 00:34:33,376 [INFO] [EPOCH 10/10 EVAL] Train Loss: 0.0369 | Val Loss: 3.1533 | Val Acc: 57.75% | Val Macro-F1: 52.98% | F1 Neutral: 28.68%
+2026-10-18 00:34:35,433 [INFO] Pelatihan 10 Epoch selesai dalam 1163.30 detik (19.39 menit).
+2026-10-18 00:34:35,442 [INFO] Saved: data/results/epoch_history_10epochs.csv
+2026-10-18 00:34:37,123 [INFO] Saved: paper_assets/figure3_training_curves_10epochs.png (300 DPI)
+2026-10-18 00:34:37,124 [INFO] 
+----------------------------------------------------------------------
+2026-10-18 00:34:37,124 [INFO] EVALUASI TEST SET TERAKHIR (MODEL TERBAIK DARI VALIDATION SET)...
+2026-10-18 00:34:37,124 [INFO] ----------------------------------------------------------------------
+2026-10-18 00:34:40,760 [INFO] Saved: data/results/metrics_indobert_10epochs.csv
+2026-10-18 00:34:41,182 [INFO] Saved: paper_assets/figure4_confusion_matrix_10epochs.png (300 DPI)
+2026-10-18 00:34:41,183 [INFO] 
+================================================================================
+2026-10-18 00:34:41,183 [INFO] HASIL AKHIR TEST SET: Accuracy = 62.91%, Macro-F1 = 59.98%
+2026-10-18 00:34:41,183 [INFO] Target 80% Tercapai: TIDAK (BELUM TERCAPAI)
+2026-10-18 00:34:41,183 [INFO] ================================================================================
